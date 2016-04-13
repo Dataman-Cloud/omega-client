@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from beanbag.v2 import BeanBag, GET, POST, DELETE, BeanBagException
 import requests
 
@@ -76,19 +78,19 @@ class OmegaClient(object):
         return GET(self.client.clusters[cluster_id].new_node_identifier)
 
     @check_return_code
-    def get_apps(self, cluster_id):
+    def get_cluster_apps(self, cluster_id):
         return GET(self.client.clusters[cluster_id].apps)
 
     @check_return_code
-    def post_apps(self, cluster_id, **kwargs):
+    def post_cluster_apps(self, cluster_id, **kwargs):
         return POST(self.client.clusters[cluster_id].apps, kwargs)
 
     @check_return_code
-    def get_app(self, cluster_id, app_id):
+    def get_cluster_app(self, cluster_id, app_id):
         return GET(self.client.clusters[cluster_id].apps[app_id])
 
     @check_return_code
-    def delete_app(self, cluster_id, app_id):
+    def delete_cluster_app(self, cluster_id, app_id):
         return DELETE(self.client.clusters[cluster_id].apps[app_id])
 
     @check_return_code
@@ -98,3 +100,23 @@ class OmegaClient(object):
     @check_return_code
     def delete_nodes(self, cluster_id, *args):
         return DELETE(self.client.clusters[cluster_id].nodes, args)
+
+    @check_return_code
+    def get_user_apps(self, **kwargs):
+        return GET(self.client.apps, kwargs)
+
+    @check_return_code
+    def get_user_apps_status(self):
+        # APP_STATUS_MAPPING = {
+        #     '1': "部署中",
+        #     '2': "运行中",
+        #     '3': "已停止",
+        #     '4': "停止中 ",
+        #     '5': "删除中",
+        #     '6': "扩展中",
+        #     '7': "启动中",
+        #     '8': "撤销中",
+        #     '9': "失联",
+        #     '10': "异常"
+        # }
+        return GET(self.client.apps.status)
