@@ -29,7 +29,7 @@ class OmegaClient(object):
 
     def __init__(self, server_url, email, password):
         self.session = requests.session()
-        self.client = BeanBag(server_url + BASE_URL, session=self.session)
+        self.client = BeanBag(server_url + BASE_URL, session=self.session, use_attrdict=False)
 
         token = self.get_token(email, password)
         self.session.headers["Authorization"] = token
