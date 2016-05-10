@@ -128,10 +128,24 @@ class OmegaClient(object):
         # }
         return GET(self.client.apps.status)
 
-    @check_return_code
     def get_app_versions(self, cluster_id, app_id):
         """Get app's histroy versions."""
         try:
-            GET(self.client.clusters[cluster_id].apps[app_id].versions)
+            return GET(self.client.clusters[cluster_id].apps[app_id].versions)
         except BeanBagException as exc:
             raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+    def delete_app_version(self, cluster_id, app_id, version_id):
+        """Delete app version according `cluster_id` `app_id` and `version_id`."""
+        try:
+            return DELETE(self.client.clusters[cluster_id].apps[app_id].versions[version_id])
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+    def update_cluster_app(self, cluster_id, app_id, **kwargs):
+        """Update app's status"""
+        try:
+            retrun POST(self.client.clusters[cluster_id].apps[app_id], kwargs)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
