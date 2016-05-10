@@ -44,7 +44,7 @@ class OmegaClient(object):
     def get_token(self, email, password):
         try:
             return POST(self.client.auth, {'email': email, 'password': password})['data']['token']
-        except BeanBagException, e:
+        except BeanBagException as e:
             raise
 
     def __call__(self, *args, **kwargs):
