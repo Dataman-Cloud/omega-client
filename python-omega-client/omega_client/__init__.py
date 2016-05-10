@@ -127,3 +127,11 @@ class OmegaClient(object):
         #     '10': "异常"
         # }
         return GET(self.client.apps.status)
+
+    @check_return_code
+    def get_app_versions(self, cluster_id, app_id):
+        """Get app's histroy versions."""
+        try:
+            GET(self.client.clusters[cluster_id].apps[app_id].versions)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
