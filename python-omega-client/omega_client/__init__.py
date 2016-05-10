@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from beanbag.v2 import BeanBag, GET, POST, DELETE, BeanBagException
+from beanbag.v2 import BeanBag, GET, POST, DELETE, PUT, PATCH, BeanBagException
 import requests
 
 
@@ -8,7 +8,14 @@ BASE_URL = '/api/v3'
 
 
 class OmegaException(Exception):
-    pass
+    msg = "A unknown exception occurred."
+
+    def __init__(self, message=None, status_code=None):
+        if not message:
+            message = msg
+        self.status_code = status_code
+
+        super(OmegaException, self).__init__(message)
 
 
 def check_return_code(function):
@@ -37,7 +44,7 @@ class OmegaClient(object):
     def get_token(self, email, password):
         try:
             return POST(self.client.auth, {'email': email, 'password': password})['data']['token']
-        except BeanBagException, e:
+        except BeanBagException as e:
             raise
 
     def __call__(self, *args, **kwargs):
@@ -120,3 +127,56 @@ class OmegaClient(object):
         #     '10': "异常"
         # }
         return GET(self.client.apps.status)
+
+    def get_app_versions(self, cluster_id, app_id):
+        """Get app's histroy versions."""
+
+        try:
+            return GET(self.client.clusters[cluster_id].apps[app_id].versions)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+    def delete_app_version(self, cluster_id, app_id, version_id):
+        """Delete app version according `cluster_id` `app_id` and `version_id`."""
+
+        try:
+            return DELETE(self.client.clusters[cluster_id].apps[app_id].versions[version_id])
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+    def update_cluster_app(self, cluster_id, app_id, **kwargs):
+        """Update app's status"""
+
+        try:
+            return PATCH(self.client.clusters[cluster_id].apps[app_id], kwargs)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+
+    def modified_cluster_app(self, cluster_id, app_id, **kwargs):
+        """Modified app configuration."""
+
+        try:
+            return PUT(self.client.clusters[cluster_id].apps[app_id], kwargs)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+    def get_app_instance(self, cluster_id, app_id):
+        """Get all instances belong to the app"""
+
+        try:
+            return GET(self.client.clusters[cluster_id].apps[app_id].tasks)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+    def get_app_events(self, cluster_id, app_id, **kwargs):
+	"""
+        Get app events total `page` pages perpage `per_page` entries.
+        For example get the first two page and 50 items perpage.
+        """
+        try:
+            return GET(self.client.clusters[cluster_id].apps[app_id], kwargs)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+        
