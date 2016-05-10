@@ -8,7 +8,14 @@ BASE_URL = '/api/v3'
 
 
 class OmegaException(Exception):
-    pass
+    msg = "A unknown exception occurred."
+
+    def __init__(self, message=None, status_code=None):
+        if not message:
+            message = msg
+        self.status_code = status_code
+
+        super(OmegaException, self).__init__(message)
 
 
 def check_return_code(function):
