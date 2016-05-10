@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from beanbag.v2 import BeanBag, GET, POST, DELETE, BeanBagException
+from beanbag.v2 import BeanBag, GET, POST, DELETE, PUT, PATCH, BeanBagException
 import requests
 
 
@@ -130,6 +130,7 @@ class OmegaClient(object):
 
     def get_app_versions(self, cluster_id, app_id):
         """Get app's histroy versions."""
+
         try:
             return GET(self.client.clusters[cluster_id].apps[app_id].versions)
         except BeanBagException as exc:
@@ -137,6 +138,7 @@ class OmegaClient(object):
 
     def delete_app_version(self, cluster_id, app_id, version_id):
         """Delete app version according `cluster_id` `app_id` and `version_id`."""
+
         try:
             return DELETE(self.client.clusters[cluster_id].apps[app_id].versions[version_id])
         except BeanBagException as exc:
@@ -144,8 +146,37 @@ class OmegaClient(object):
 
     def update_cluster_app(self, cluster_id, app_id, **kwargs):
         """Update app's status"""
+
         try:
-            retrun POST(self.client.clusters[cluster_id].apps[app_id], kwargs)
+            retrun PATCH(self.client.clusters[cluster_id].apps[app_id], kwargs)
         except BeanBagException as exc:
             raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
 
+
+    def modified_cluster_app(self, cluster_id, app_id, **kwargs):
+        """Modified app configuration."""
+
+        try:
+            return PUT(self.client.clusters[cluster_id].apps[app_id], kwargs)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+    def get_app_instance(self, cluster_id, app_id):
+        """Get all instances belong to the app"""
+
+        try:
+            return GET(self.cluster.clusters[cluster_id].apps[app_id].tasks)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+    def get_app_events(self, cluster_id, app_id, page=1, per_page=50):
+	"""
+        Get app events total `page` pages perpage `per_page` entries.
+        For example get the first two page and 50 items perpage.
+        """
+        try:
+            return GET(self.cluster.clusters[cluster_id].apps[app_id], page=page, per_page=per_page)
+        except BeanBagException as exc:
+            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+
+        
