@@ -148,7 +148,7 @@ class OmegaClient(object):
         """Update app's status"""
 
         try:
-            retrun PATCH(self.client.clusters[cluster_id].apps[app_id], kwargs)
+            return PATCH(self.client.clusters[cluster_id].apps[app_id], kwargs)
         except BeanBagException as exc:
             raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
 
