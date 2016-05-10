@@ -165,17 +165,17 @@ class OmegaClient(object):
         """Get all instances belong to the app"""
 
         try:
-            return GET(self.cluster.clusters[cluster_id].apps[app_id].tasks)
+            return GET(self.client.clusters[cluster_id].apps[app_id].tasks)
         except BeanBagException as exc:
             raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
 
-    def get_app_events(self, cluster_id, app_id, page=1, per_page=50):
+    def get_app_events(self, cluster_id, app_id, **kwargs):
 	"""
         Get app events total `page` pages perpage `per_page` entries.
         For example get the first two page and 50 items perpage.
         """
         try:
-            return GET(self.cluster.clusters[cluster_id].apps[app_id], page=page, per_page=per_page)
+            return GET(self.client.clusters[cluster_id].apps[app_id], kwargs)
         except BeanBagException as exc:
             raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
 
