@@ -113,6 +113,10 @@ class OmegaClient(object):
         return GET(self.client.apps, kwargs)
 
     @check_return_code
+    def get_cluster_matrix(self, cluster_id, **kwargs):
+        return GET(self.client.clusters[cluster_id].metrics, kwargs)
+
+    @check_return_code
     def get_user_apps_status(self):
         # APP_STATUS_MAPPING = {
         #     '1': "部署中",
@@ -179,4 +183,4 @@ class OmegaClient(object):
         except BeanBagException as exc:
             raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
 
-        
+
