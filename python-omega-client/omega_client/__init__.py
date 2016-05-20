@@ -36,7 +36,7 @@ class OmegaClient(object):
 
     def __init__(self, server_url, email, password):
         self.session = requests.session()
-        self.client = BeanBag(server_url + BASE_URL, session=self.session, use_attrdict=False)
+        self.client = BeanBag(server_url + BASE_URL, session=self.session, use_attrdict=True)
 
         token = self.get_token(email, password)
         self.session.headers["Authorization"] = token
@@ -179,7 +179,7 @@ class OmegaClient(object):
         For example get the first two page and 50 items perpage.
         """
         try:
-            return GET(self.client.clusters[cluster_id].apps[app_id], kwargs)
+            return GET(self.client.clusters[cluster_id].apps[app_id].events, kwargs)
         except BeanBagException as exc:
             raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
 
