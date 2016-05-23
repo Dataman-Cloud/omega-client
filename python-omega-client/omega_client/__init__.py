@@ -44,7 +44,7 @@ class OmegaClient(object):
         token = self.get_token(email, password)
         self.session.headers["Authorization"] = token
 
-        self.http = HTTPClient(token)
+        self.http = HTTPClient(server_url + BASE_URL, token)
 
     def get_token(self, email, password):
         try:
