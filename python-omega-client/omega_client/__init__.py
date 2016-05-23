@@ -2,6 +2,9 @@
 
 from beanbag.v2 import BeanBag, GET, POST, DELETE, PUT, PATCH, BeanBagException
 import requests
+from client import HTTPClient 
+from jsonschema import SchemaError, ValidationError, validate
+import webob
 
 
 BASE_URL = '/api/v3'
@@ -40,6 +43,8 @@ class OmegaClient(object):
 
         token = self.get_token(email, password)
         self.session.headers["Authorization"] = token
+
+        self.http = HTTPClient(token)
 
     def get_token(self, email, password):
         try:
@@ -183,4 +188,97 @@ class OmegaClient(object):
         except BeanBagException as exc:
             raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
 
+    def get_projects(self):
+        """List all projects(images) for user."""
+        return self.http.get("/projects")
 
+    def create_project(self, uid, project_name, image_name,desc,
+                             repo, branch, active, period, trigger_type):
+        """Create new project.
+
+        :param uid: user id
+        :param project_name: project name the image belong to
+        :param image_name: image name to build
+        :param desc: image description 
+        :param repo: the repository url contains the Dockerfile for building
+        :param branch: the repository's branch. eg. master.
+        :param active: whether switch on the automatic build. true or false.
+        :param period: the aotomatic build period. unit is minute.
+        :param trigger_type: automatic build conditions. 1 means tag. 2 means branch. 3 means tag and branch.
+        """
+        body = {
+            "uid": uid,
+            "name": project_name,
+            "imageName": image_name,
+            "description": desc,
+            "repoUri": repo,
+            "branch": branch,
+            "active": active,
+            "period": period,
+            "triggerType": trigger_type,
+        }
+        schema = {  
+            "type": "object",
+            "properties": {
+                "uid": {"type": "number"},
+                "name": {"type": "string"},
+                "imageName": {"type": "string"},
+                "description": {"type": "string"},
+                "repoUri": {"type": "string"},
+                "branch": {"type": "string"},
+                "active": {"type": "boolean"},
+                "period": {"type": "number"},
+                "triggerType": {"type": "number"},
+            },
+            "required": ["uid", "name", "imageName", "description", "repoUri", "branch", "active", "period", "triggerType"]
+        }
+       
+        try:
+            validate(body, schema)
+        except (SchemaError, ValidationError):
+            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+
+        return self.http.post("/projects", body=body)
+
+    def delete_project(self, project_id):
+        return self.http.delete("/projects/{}".format(project_id))
+
+    def get_project(self, project_id):
+        return self.http.get("/projects/{}".format(project_id))
+
+    def put_project(self, project_id, uid, active, period, trigger_type):
+        """Update project's partial infomation"""
+        body = {
+            "uid": uid,
+            "active": active,
+            "period": period,
+            "trigger_type": trigger_type
+        }
+  
+        schema = {
+            "type": "object",
+            "properties": {
+                "uid": {"type": "number"},
+                "active": {"type": "boolean"},
+                "period": {"type": "number"},
+                "trigger_type": {"type": "number"},
+            },
+            "required": ["uid", "active", "period", "trigger_type"]
+        }
+             
+        try:
+            validate(body, schema)
+        except (SchemaError, ValidationError):
+            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+
+        return self.http.put("/projects/{}".format(project_id), body=body)
+
+    def get_project_builds(self, project_id):
+        """List all builds for a project."""
+        return self.http.get("/projects/{}/builds".format(project_id)) 
+
+    def get_project_build_log(self, project_id, build_id, job_id):
+        return self.http.get("/projects/{}/builds/{}/{}/logs".format(project_id,build_id,job_id))
+
+    def get_project_build_stream(self, project_id, build_id, job_id):
+        return self.http.get("/projects/{}/builds/{}/{}/logs".format(project_id,build_id,job_id))
