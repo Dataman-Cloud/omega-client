@@ -1,0 +1,6 @@
+.idea
+*.py[co]
+*.swp
+dist/*
+build/*
+omegaclient.egg-info/*

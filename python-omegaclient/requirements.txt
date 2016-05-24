@@ -1,0 +1,7 @@
+requests
+beanbag
+# dev
+ipdb
+jsonschema
+webob
+
