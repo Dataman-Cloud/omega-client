@@ -24,22 +24,59 @@ class ClusterAPI(object):
 
     def index(self):
         """List all clusters"""
-        self.http.get(self.path)
+        return self.http.get(self.path)
 
     def show(self, id):
         """List specified cluster"""
-        self.http.get(url_maker(self.path, id))
+        return self.http.get(url_maker(self.path, id))
 
     def create(self, body):
         """Create new cluster"""
-        self.http.post(self.path, body=body)
+        return self.http.post(self.path, body=body)
 
-    def delete(self, id):
+    def create_node(self, cluster_id, **kwargs):
+        """Add new node for cluster identified by `cluster_id`"""
+        return self.http.post(url_maker(self.path, cluster_id, "nodes"),
+                              body=kwargs)
+
+    def delete(self, cluster_id):
         """Delete specified cluster"""
-        self.http.delete(url_maker(self.path, id))
+        return self.http.delete(url_maker(self.path, cluster_id))
 
-    def update(self, id, body):
+    def delete_nodes(self, cluster_id, *args):
+        """Delete nodes for cluster identified by `cluster_id`"""
+        return self.http.delete(url_maker(self.path, cluster_id, "node"),
+                                body=args)
+
+    def update(self,  body):
         """Update cluster partial"""
-        self.http.patch(url_maker(self.path, id), body=body)
+        return self.http.patch(url_maker(self.path, id), body=body)
     
-    def versions(self, 
+    def versions(self):
+        pass
+
+    def identifier(self, cluster_id):
+        """Generated new node uuid belong to specified cluster"""
+        return self.http.get(url_maker(self.path, cluster_id,
+                                       "new_node_identifier"))
+    
+    def node(self, cluster_id, node_id):
+        """List node information for specified cluster"""
+        return self.http.get(url_maker(self.path, cluster_id, "nodes",
+                                       node_id))
+    
+    def update_node(self, cluster_id, node_id, **kwargs):
+        """Updated node information for speicified cluster"""
+        return self.http.patch(url_maker(self.path, cluster_id,
+                                         "nodes", node_id), **kwargs)
+
+    def metrics(self, cluster_id, node_id):
+        """List metrics for node of specified cluster"""
+        return self.http.get(url_maker(self.path, cluster_id, "nodes",
+                                       node_id))
+
+    def service(self, cluster_id, node_id, service_name, **kwargs):
+        """Reset or Restart specified service"""
+        return self.http.patch(url_maker(self.path, cluster_id, "nodes",
+                                         node_id, "services", service_name),
+                               **kwargs)

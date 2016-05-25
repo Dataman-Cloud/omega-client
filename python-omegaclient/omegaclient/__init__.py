@@ -1,83 +1,79 @@
-# -*- coding: utf-8 -*-
+# Copyright (c) 2016 Dataman Cloud
+# All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
 
-from beanbag.v2 import BeanBag, GET, POST, DELETE, PUT, PATCH, BeanBagException
 import requests
-from client import HTTPClient 
+from client import HTTPClient
 from jsonschema import SchemaError, ValidationError, validate
 import webob
 from omageclient.cluster import ClusterAPI
 from omageclient.app import AppAPI
 from omageclient.project import ProjectAPI
 from omageclient.utils import url_maker
+import copy
 
-
-BASE_URL = '/api/v3'
-
-
-class OmegaException(Exception):
-    msg = "A unknown exception occurred."
-
-    def __init__(self, message=None, status_code=None):
-        if not message:
-            message = msg
-        self.status_code = status_code
-
-        super(OmegaException, self).__init__(message)
-
-
-def check_return_code(function):
-    def with_code_check(*args, **kwargs):
-        # raise exception when omega get code big than zero;
-        try:
-            rst = function(*args, **kwargs)
-            if 'code' in rst and rst['code'] > 0:
-                raise OmegaException("Calls to Omega got unexpected result: %s" % rst)
-            return rst
-        except Exception as e:
-            raise OmegaException(e)
-
-    return with_code_check
+#class OmegaException(Exception):
+#    msg = "A unknown exception occurred."
+#
+#    def __init__(self, message=None, status_code=None):
+#        if not message:
+#            message = msg
+#        self.status_code = status_code
+#
+#        super(OmegaException, self).__init__(message)
+#
+#
+#def check_return_code(function):
+#    def with_code_check(*args, **kwargs):
+#        # raise exception when omega get code big than zero;
+#        try:
+#            rst = function(*args, **kwargs)
+#            if 'code' in rst and rst['code'] > 0:
+#                raise OmegaException("Calls to Omega got unexpected result: %s" % rst)
+#            return rst
+#        except Exception as e:
+#            raise OmegaException(e)
+#
+#    return with_code_check
 
 
 class OmegaClient(object):
 
     def __init__(self, server_url, email, password):
-        self.session = requests.session()
-        self.client = BeanBag(server_url + BASE_URL, session=self.session, use_attrdict=True)
 
-        token = self.get_token(email, password)
-        self.session.headers["Authorization"] = token
-
-        self.http = HTTPClient(url_maker(server_url, BASE_URL), token)
+        self.http = HTTPClient(server_url, email, password)
         self.cluster_api = ClusterAPI(self.http) 
         self.app_api = AppAPI(self.http)
         self.project_api = ProjectAPI(self.http) 
 
-    def get_token(self, email, password):
-        try:
-            return POST(self.client.auth, {'email': email, 'password': password})['data']['token']
-        except BeanBagException as e:
-            raise
-
-    def __call__(self, *args, **kwargs):
-        return self.client(*args, **kwargs)
-
-    def __getattr__(self, name):
-        return self.client.__getattr__(name)
-
-    def __getitem__(self, *args, **kwargs):
-        return self.client.__getitem__(*args, **kwargs)
-
-    @check_return_code
-    def get_auth(self):
-        return GET(self.client.auth)
-
-    @check_return_code
-    def post_auth(self, email, password):
-        return POST(self.client.auth, {'email': email, 'password': password})
+    # Cluster Associated APIS
+    # The following apis are cluster associated apis, contains:
+    # get_cluster 
+    # get_clusters
+    # create_cluster
+    # delete_cluster
+    # get_node_identifier
+    # get_cluster_node
+    # update_cluster_node
+    # get_node_metrics
+    # update_node_service
+    # post_nodes
+    # delete_nodes
 
     def get_clusters(self):
-        #return GET(self.client.clusters)
+        """List all clusters"""
+
         return self.cluster_api.index()
 
     def create_cluster(self, name, cluster_type, group_id):
@@ -103,28 +99,62 @@ class OmegaClient(object):
             },
             "required": ["name", "clusterType", "groupId"]
         }
-        #return POST(self.client.clusters, kwargs)
         return self.cluster_api.create(body=body)
 
     def get_cluster(self, cluster_id):
-        #return GET(self.client.clusters[cluster_id])
+
         return self.cluster_api.show(cluster_id)
 
     def delete_cluster(self, cluster_id):
-        #return DELETE(self.client.clusters[cluster_id])
+
         return self.cluster_api.delete(cluster_id)
 
-    @check_return_code
     def get_node_identifier(self, cluster_id):
-        return GET(self.client.clusters[cluster_id].new_node_identifier)
 
-    def get_cluster_apps(self, cluster_id):
-        #return GET(self.client.clusters[cluster_id].apps)
-        return self.app_api.index(cluster_id)
+        return self.cluster_api.identifier(cluster_id)
 
-    @check_return_code
-    def post_cluster_apps(self, cluster_id, **kwargs):
+    def get_cluster_node(self, cluster_id, node_id):
+        """List node information for specified cluster"""
+
+        return self.cluster_api.node(cluster_id, node_id)
+
+    def update_cluster_node(self, cluster_id, node_id, **kwargs):
+        """Updated node information for specified cluster"""
+
+        return self.cluster_api.update_node(cluster_id, node_id, **kwargs)
+
+    def get_node_metrics(self, cluster_id, node_id):
+        """List metrics for node of specified cluster"""
+        return self.cluster_api.metrics(cluster_id, node_id)
+
+    def update_node_service(self, cluster_id, node_id, service_name, **kwargs):
+        """Reset or restart service on speicified node"""
+        return self.cluster_api.service(cluster_id, node_id, service_name,
+                                        **kwargs)
+
+    def post_nodes(self, cluster_id, **kwargs):
+        """Add new node for cluster identified by `cluster_id`"""
+
+        return self.cluster_api.create_node(cluster_id, **kwargs)
+
+    def delete_nodes(self, cluster_id, *args):
+
+        return self.cluster_api.delete_nodes(cluster_id, *args)
+
+    # APP Associated APIS
+
+    def get_cluster_apps(self, cluster_id, **kwargs):
+        """List all apps for speicified cluster"""
+
+        kwargs['cluster_id'] = cluster_id
+        return self.app_api.index(**kwargs)
+
+    def create_cluster_apps(self, cluster_id, **kwargs):
+        """Create app under speicified cluster"""
+
+        # NOTE(mgniu): `deep copy or shadow copy? i'm confused.
         body = copy.deepcopy(kwargs)
+
         schema = {
             "type": "object",
             "properties": {
@@ -135,12 +165,12 @@ class OmegaClient(object):
                     "items": {
                         "type": "object",
                         "properties": {
-                            "hostPath" : {"type": "string"},
-                             "containerPath": {"type": "string"},
+                            "hostPath": {"type": "string"},
+                            "containerPath": {"type": "string"},
                          },
                      },
                  },
-                 "portMappings": {
+                "portMappings": {
                      "type": "array",
                      "items": {
                          "type": "object",
@@ -154,10 +184,10 @@ class OmegaClient(object):
                           },
                       },
                    },
-                   "cpus": {"type": "number"},
-                   "mem": {"type": "number"},
-                   "cmd": {"type": "string"},
-                   "envs": {
+                "cpus": {"type": "number"},
+                "mem": {"type": "number"},
+                "cmd": {"type": "string"},
+                "envs": {
                        "type": "array",
                        "items": {
                            "type": "object",
@@ -167,18 +197,18 @@ class OmegaClient(object):
                             },
                         },
                    },
-                   "imageName": {"type": "string"},
-                   "imageVersion": {"type": "string"},
-                   "forceImage": {"type": "boolean"},
-                   "network": {"type": "string"},
-                   "constraints": {
+                "imageName": {"type": "string"},
+                "imageVersion": {"type": "string"},
+                "forceImage": {"type": "boolean"},
+                "network": {"type": "string"},
+                "constraints": {
                        "type": "array",
                        "items": {
                            "type": "array",
                            "items": {"type": "string"},
                        },
                    },
-                   "parameters": {
+                "parameters": {
                        "type": "array",
                        "items": {
                            "type": "object",
@@ -187,7 +217,7 @@ class OmegaClient(object):
                                "value": {"type": "string"},
                            },
                        },
-                   } 
+                   }
             }
         }
         try:
@@ -195,105 +225,87 @@ class OmegaClient(object):
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        return POST(self.client.clusters[cluster_id].apps, kwargs)
+        return self.app_api.create(cluster_id, body=body)
 
-    @check_return_code
     def get_cluster_app(self, cluster_id, app_id):
-        #return GET(self.client.clusters[cluster_id].apps[app_id])
+        """List specified app information under specified cluster"""
+
         return self.app_api.show(cluster_id, app_id)
 
-    @check_return_code
     def delete_cluster_app(self, cluster_id, app_id):
-        return DELETE(self.client.clusters[cluster_id].apps[app_id])
+        """Delete speicified app under specified cluster"""
 
-    @check_return_code
-    def post_nodes(self, cluster_id, **kwargs):
-        return POST(self.client.clusters[cluster_id].nodes, kwargs)
+        self.app_api.delete(cluster_id, app_id)
 
-    @check_return_code
-    def delete_nodes(self, cluster_id, *args):
-        return DELETE(self.client.clusters[cluster_id].nodes, args)
-
-    @check_return_code
     def get_user_apps(self, **kwargs):
-        return GET(self.client.apps, kwargs)
+        """List all apps belong to specified user."""
 
-    @check_return_code
-    def get_cluster_matrix(self, cluster_id, **kwargs):
-        return GET(self.client.clusters[cluster_id].metrics, kwargs)
+        return self.app_api.index(**kwargs)
 
-    @check_return_code
+
     def get_user_apps_status(self):
-        # APP_STATUS_MAPPING = {
-        #     '1': "部署中",
-        #     '2': "运行中",
-        #     '3': "已停止",
-        #     '4': "停止中 ",
-        #     '5': "删除中",
-        #     '6': "扩展中",
-        #     '7': "启动中",
-        #     '8': "撤销中",
-        #     '9': "失联",
-        #     '10': "异常"
-        # }
-        return GET(self.client.apps.status)
+        """
+        APP_STATUS_MAPPING = {
+             '1': "部署中",
+             '2': "运行中",
+             '3': "已停止",
+             '4': "停止中 ",
+             '5': "删除中",
+             '6': "扩展中",
+             '7': "启动中",
+             '8': "撤销中",
+             '9': "失联",
+             '10': "异常"
+         }
+         """
+        return self.app_api.status()
 
     def get_app_versions(self, cluster_id, app_id):
         """Get app's histroy versions."""
 
-        try:
-            return GET(self.client.clusters[cluster_id].apps[app_id].versions)
-        except BeanBagException as exc:
-            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+        #try:
+        #    return GET(self.client.clusters[cluster_id].apps[app_id].versions)
+        #except BeanBagException as exc:
+        #    raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+        return self.app_api.versions(cluster_id, app_id)
 
     def delete_app_version(self, cluster_id, app_id, version_id):
         """Delete app version according `cluster_id` `app_id` and `version_id`."""
 
-        try:
-            return DELETE(self.client.clusters[cluster_id].apps[app_id].versions[version_id])
-        except BeanBagException as exc:
-            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+        #try:
+        #    return DELETE(self.client.clusters[cluster_id].apps[app_id].versions[version_id])
+        #except BeanBagException as exc:
+        #    raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+        return self.app_api.delete(cluster_id, app_id, version_id)
 
     def update_cluster_app(self, cluster_id, app_id, **kwargs):
         """Update app's status"""
 
-        try:
-            return PATCH(self.client.clusters[cluster_id].apps[app_id], kwargs)
-        except BeanBagException as exc:
-            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+        #try:
+        #    return PATCH(self.client.clusters[cluster_id].apps[app_id], kwargs)
+        #except BeanBagException as exc:
+        #    raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+        self.app_api.update(cluster_id, app_id, **kwargs)
 
-
-    def modified_cluster_app(self, cluster_id, app_id, **kwargs):
-        """Modified app configuration."""
-
-        try:
-            return PUT(self.client.clusters[cluster_id].apps[app_id], kwargs)
-        except BeanBagException as exc:
-            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
-
-    def get_app_instance(self, cluster_id, app_id):
+    def get_app_instances(self, cluster_id, app_id):
         """Get all instances belong to the app"""
 
-        try:
-            return GET(self.client.clusters[cluster_id].apps[app_id].tasks)
-        except BeanBagException as exc:
-            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+        return self.app_api.instancs(cluster_id, app_id)
 
     def get_app_events(self, cluster_id, app_id, **kwargs):
         """
         Get app events total `page` pages perpage `per_page` entries.
         For example get the first two page and 50 items perpage.
         """
-        try:
-            return GET(self.client.clusters[cluster_id].apps[app_id].events, kwargs)
-        except BeanBagException as exc:
-            raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
+        return self.app_api.events(cluster_id, app_id)
 
     def get_projects(self):
         """List all projects(images) for user."""
         return self.http.get("/projects")
 
-    def create_project(self, uid, project_name, image_name,desc,
+    # Project Associated APIS
+
+    def create_project(self, uid, project_name, image_name, desc,
                              repo, branch, active, period, trigger_type):
         """Create new project.
 
@@ -342,14 +354,14 @@ class OmegaClient(object):
         return self.project_api.create(body=body)
 
     def delete_project(self, project_id):
-        #return self.http.delete("/projects/{}".format(project_id))
+
         return self.project_api.delete(project_id)
 
     def get_project(self, project_id):
-        #return self.http.get("/projects/{}".format(project_id))
+
         return self.project_api.show(project_id) 
 
-    def put_project(self, project_id, uid, active, period, trigger_type):
+    def update_project(self, project_id, uid, active, period, trigger_type):
         """Update project's partial infomation"""
         body = {
             "uid": uid,
@@ -374,18 +386,17 @@ class OmegaClient(object):
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        #return self.http.put("/projects/{}".format(project_id), body=body)
-        return self.project_api.put(project_id,body)
+        return self.project_api.update(project_id, body)
 
     def get_project_builds(self, project_id):
         """List all builds for a project."""
-        #return self.http.get("/projects/{}/builds".format(project_id)) 
+
         return self.project_api.builds(project_id)
 
     def get_project_build_log(self, project_id, build_num, job_id):
-        #return self.http.get("/projects/{}/builds/{}/{}/logs".format(project_id,build_id,job_id))
+
         return self.project_api.logs(project_id, build_num, job_id)
 
     def get_project_build_stream(self, project_id, build_num, job_id):
-        #return self.http.get("/projects/{}/builds/{}/{}/logs".format(project_id,build_id,job_id))
+
         return self.project_api.stream(project_id, build_num, job_id)

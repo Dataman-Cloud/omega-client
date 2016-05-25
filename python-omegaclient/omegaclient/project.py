@@ -33,24 +33,26 @@ class ProjectAPI(object):
 
     def create(self, body):
         """create new project."""
-        return self.http.post(self.prefix, body=body)
+        return self.http.post(self.prefix, data=body)
 
     def update(self, id, body):
         """update project information."""
-        return self.http.patch(url_maker(self.prefix, id), body=body)
+        return self.http.patch(url_maker(self.prefix, id), data=body)
 
     def delete(self, id):
         """delete project"""
-        return self.http.delete(url_maker(self.prefix,id))
+        return self.http.delete(url_maker(self.prefix, id))
 
     def builds(self, id):
         """list all builds for project"""
         return self.http.get(url_maker(self.prefix, id, "builds"))
 
     def logs(self, id, build_num, job_id):
-        """list all build logs for project""" 
-        return self.http.get(url_maker(self.prefix, id, "builds", build_num, job_id))
+        """list all build logs for project"""
+        return self.http.get(url_maker(self.prefix, id, "builds",
+                                       build_num, job_id))
 
     def stream(self, id, build_num, job_id):
         """list all build text stream for project"""
-        return self.http.get(url_maker(self.prefix, id, "builds", build_num, job_id))
+        return self.http.get(url_maker(self.prefix, id, "builds",
+                                       build_num, job_id))
