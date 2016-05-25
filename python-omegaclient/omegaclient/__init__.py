@@ -13,39 +13,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import requests
 from client import HTTPClient
 from jsonschema import SchemaError, ValidationError, validate
 import webob
 from omageclient.cluster import ClusterAPI
 from omageclient.app import AppAPI
 from omageclient.project import ProjectAPI
-from omageclient.utils import url_maker
 import copy
-
-#class OmegaException(Exception):
-#    msg = "A unknown exception occurred."
-#
-#    def __init__(self, message=None, status_code=None):
-#        if not message:
-#            message = msg
-#        self.status_code = status_code
-#
-#        super(OmegaException, self).__init__(message)
-#
-#
-#def check_return_code(function):
-#    def with_code_check(*args, **kwargs):
-#        # raise exception when omega get code big than zero;
-#        try:
-#            rst = function(*args, **kwargs)
-#            if 'code' in rst and rst['code'] > 0:
-#                raise OmegaException("Calls to Omega got unexpected result: %s" % rst)
-#            return rst
-#        except Exception as e:
-#            raise OmegaException(e)
-#
-#    return with_code_check
 
 
 class OmegaClient(object):
@@ -53,23 +27,9 @@ class OmegaClient(object):
     def __init__(self, server_url, email, password):
 
         self.http = HTTPClient(server_url, email, password)
-        self.cluster_api = ClusterAPI(self.http) 
+        self.cluster_api = ClusterAPI(self.http)
         self.app_api = AppAPI(self.http)
-        self.project_api = ProjectAPI(self.http) 
-
-    # Cluster Associated APIS
-    # The following apis are cluster associated apis, contains:
-    # get_cluster 
-    # get_clusters
-    # create_cluster
-    # delete_cluster
-    # get_node_identifier
-    # get_cluster_node
-    # update_cluster_node
-    # get_node_metrics
-    # update_node_service
-    # post_nodes
-    # delete_nodes
+        self.project_api = ProjectAPI(self.http)
 
     def get_clusters(self):
         """List all clusters"""
@@ -79,12 +39,13 @@ class OmegaClient(object):
     def create_cluster(self, name, cluster_type, group_id):
         """
         Create new cluster.
-       
+
         :param name: cluster name
-        :param cluster_type: cluster type, current support values are: 1_master, 3_masters, 5_masters
+        :param cluster_type: cluster type, current support values are:
+                             1_master, 3_masters, 5_masters
         :param group_id: the group which the new cluster belong to
         """
-        body = {
+        data = {
             "name": name,
             "clusterType": cluster_type,
             "groupId": group_id,
@@ -99,7 +60,12 @@ class OmegaClient(object):
             },
             "required": ["name", "clusterType", "groupId"]
         }
-        return self.cluster_api.create(body=body)
+        try:
+            validate(data, schema)
+        except (SchemaError, ValidationError):
+            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+
+        return self.cluster_api.create(body=data)
 
     def get_cluster(self, cluster_id):
 
@@ -132,7 +98,7 @@ class OmegaClient(object):
         return self.cluster_api.service(cluster_id, node_id, service_name,
                                         **kwargs)
 
-    def post_nodes(self, cluster_id, **kwargs):
+    def create_node(self, cluster_id, **kwargs):
         """Add new node for cluster identified by `cluster_id`"""
 
         return self.cluster_api.create_node(cluster_id, **kwargs)
@@ -149,11 +115,15 @@ class OmegaClient(object):
         kwargs['cluster_id'] = cluster_id
         return self.app_api.index(**kwargs)
 
-    def create_cluster_apps(self, cluster_id, **kwargs):
-        """Create app under speicified cluster"""
+    def create_cluster_apps(self, cluster_id, data):
+        """Create app under speicified cluster
 
-        # NOTE(mgniu): `deep copy or shadow copy? i'm confused.
-        body = copy.deepcopy(kwargs)
+        :param cluster_id: Cluster identifier
+        :param data: Dictionary to send in the body of the request.
+        """
+
+        # NOTE(mgniu): `deep copy or shallow copy? i'm confused.
+        data = copy.deepcopy(data)
 
         schema = {
             "type": "object",
@@ -221,11 +191,11 @@ class OmegaClient(object):
             }
         }
         try:
-            validate(body, schema)
+            validate(data, schema)
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        return self.app_api.create(cluster_id, body=body)
+        return self.app_api.create(cluster_id, body=data)
 
     def get_cluster_app(self, cluster_id, app_id):
         """List specified app information under specified cluster"""
@@ -241,7 +211,6 @@ class OmegaClient(object):
         """List all apps belong to specified user."""
 
         return self.app_api.index(**kwargs)
-
 
     def get_user_apps_status(self):
         """
@@ -263,28 +232,17 @@ class OmegaClient(object):
     def get_app_versions(self, cluster_id, app_id):
         """Get app's histroy versions."""
 
-        #try:
-        #    return GET(self.client.clusters[cluster_id].apps[app_id].versions)
-        #except BeanBagException as exc:
-        #    raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
         return self.app_api.versions(cluster_id, app_id)
 
     def delete_app_version(self, cluster_id, app_id, version_id):
-        """Delete app version according `cluster_id` `app_id` and `version_id`."""
+        """Delete app version according `cluster_id` `app_id` and
+        `version_id`."""
 
-        #try:
-        #    return DELETE(self.client.clusters[cluster_id].apps[app_id].versions[version_id])
-        #except BeanBagException as exc:
-        #    raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
         return self.app_api.delete(cluster_id, app_id, version_id)
 
     def update_cluster_app(self, cluster_id, app_id, **kwargs):
         """Update app's status"""
 
-        #try:
-        #    return PATCH(self.client.clusters[cluster_id].apps[app_id], kwargs)
-        #except BeanBagException as exc:
-        #    raise OmegaException(message=exc.msg, status_code=exc.response.status_code)
         self.app_api.update(cluster_id, app_id, **kwargs)
 
     def get_app_instances(self, cluster_id, app_id):
@@ -306,20 +264,21 @@ class OmegaClient(object):
     # Project Associated APIS
 
     def create_project(self, uid, project_name, image_name, desc,
-                             repo, branch, active, period, trigger_type):
+                       repo, branch, active, period, trigger_type):
         """Create new project.
 
         :param uid: user id
         :param project_name: project name the image belong to
         :param image_name: image name to build
-        :param desc: image description 
+        :param desc: image description
         :param repo: the repository url contains the Dockerfile for building
         :param branch: the repository's branch. eg. master.
         :param active: whether switch on the automatic build. true or false.
         :param period: the aotomatic build period. unit is minute.
-        :param trigger_type: automatic build conditions. 1 means tag. 2 means branch. 3 means tag and branch.
+        :param trigger_type: automatic build conditions.
+                             1 means tag. 2 means branch. 3 means tag and branch.
         """
-        body = {
+        data = {
             "uid": uid,
             "name": project_name,
             "imageName": image_name,
@@ -330,7 +289,7 @@ class OmegaClient(object):
             "period": period,
             "triggerType": trigger_type,
         }
-        schema = {  
+        schema = {
             "type": "object",
             "properties": {
                 "uid": {"type": "number"},
@@ -343,15 +302,16 @@ class OmegaClient(object):
                 "period": {"type": "number"},
                 "triggerType": {"type": "number"},
             },
-            "required": ["uid", "name", "imageName", "description", "repoUri", "branch", "active", "period", "triggerType"]
+            "required": ["uid", "name", "imageName", "description", "repoUri",
+                         "branch", "active", "period", "triggerType"]
         }
-       
+
         try:
-            validate(body, schema)
+            validate(data, schema)
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        return self.project_api.create(body=body)
+        return self.project_api.create(body=data)
 
     def delete_project(self, project_id):
 
@@ -359,7 +319,7 @@ class OmegaClient(object):
 
     def get_project(self, project_id):
 
-        return self.project_api.show(project_id) 
+        return self.project_api.show(project_id)
 
     def update_project(self, project_id, uid, active, period, trigger_type):
         """Update project's partial infomation"""
@@ -369,7 +329,7 @@ class OmegaClient(object):
             "period": period,
             "trigger_type": trigger_type
         }
-  
+
         schema = {
             "type": "object",
             "properties": {
@@ -380,7 +340,7 @@ class OmegaClient(object):
             },
             "required": ["uid", "active", "period", "trigger_type"]
         }
-             
+
         try:
             validate(body, schema)
         except (SchemaError, ValidationError):
