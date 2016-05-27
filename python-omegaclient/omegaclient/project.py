@@ -13,46 +13,89 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import webob
+from jsonschema import SchemaError, ValidationError, validate
+
 from omegaclient.utils import url_maker
+
 
 class ProjectAPI(object):
     """Project controllers for response projects apis."""
 
-    prefix = "/projects"
+    def get_projects(self):
+        """list all projects(images) for speicified user."""
+        return self.http.get("/projects")
 
-    def __init__(self, http):
-        self.http = http
-
-    def index(self):
-        """list all projects."""
-        return self.http.get(self.prefix)
-
-    def show(self, id):
+    def get_project(self, project_id):
         """show project details."""
-        return self.http.get(url_maker(self.prefix, id))
+        return self.http.get(url_maker("/projects", project_id))
 
-    def create(self, body):
+    def create_project(self, **kwargs):
         """create new project."""
-        return self.http.post(self.prefix, data=body)
 
-    def update(self, id, body):
-        """update project information."""
-        return self.http.patch(url_maker(self.prefix, id), data=body)
+        schema = {
+            "type": "object",
+            "properties": {
+                "uid": {"type": "number"},
+                "name": {"type": "string"},
+                "imageName": {"type": "string"},
+                "description": {"type": "string"},
+                "repoUri": {"type": "string"},
+                "branch": {"type": "string"},
+                "active": {"type": "boolean"},
+                "period": {"type": "number"},
+                "triggerType": {"type": "number"},
+            },
+            "required": ["uid", "name", "imageName", "description", "repoUri",
+                         "branch", "active", "period", "triggerType"]
+        }
 
-    def delete(self, id):
-        """delete project"""
-        return self.http.delete(url_maker(self.prefix, id))
+        try:
+            validate(kwargs, schema)
+        except (SchemaError, ValidationError):
+            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-    def builds(self, id):
+        return self.http.post("/projects", data=kwargs)
+
+    def update_project(self, project_id, **kwargs):
+        """Update specified project information."""
+
+        schema = {
+            "type": "object",
+            "properties": {
+                "uid": {"type": "number"},
+                "active": {"type": "boolean"},
+                "period": {"type": "number"},
+                "trigger_type": {"type": "number"},
+            },
+            "required": ["uid", "active", "period", "trigger_type"]
+        }
+
+        try:
+            validate(kwargs, schema)
+        except (SchemaError, ValidationError):
+            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+
+        return self.http.patch(url_maker("/projects", project_id), data=kwargs)
+
+    def delete_project(self, project_id):
+        """Delete specified project."""
+
+        return self.http.delete(url_maker("/projects", project_id))
+
+    def get_project_builds(self, project_id):
         """list all builds for project"""
-        return self.http.get(url_maker(self.prefix, id, "builds"))
 
-    def logs(self, id, build_num, job_id):
-        """list all build logs for project"""
-        return self.http.get(url_maker(self.prefix, id, "builds",
-                                       build_num, job_id))
+        return self.http.get(url_maker("/projects", project_id, "builds"))
 
-    def stream(self, id, build_num, job_id):
-        """list all build text stream for project"""
-        return self.http.get(url_maker(self.prefix, id, "builds",
-                                       build_num, job_id))
+    def get_build_logs(self, project_id, build_num, job_id):
+        """List all build logs for project"""
+
+        return self.http.get(url_maker("/projects", project_id, "builds",
+                                       build_num, job_id, "logs"))
+
+    def get_build_stream(self, project_id, build_num, job_id):
+        """List all build text stream for project"""
+
+        return self.http.get(url_maker("/projects", project_id, "builds",
+                                       build_num, job_id, "stream"))
