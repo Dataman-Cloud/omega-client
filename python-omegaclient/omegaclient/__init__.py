@@ -16,9 +16,9 @@
 from client import HTTPClient
 from jsonschema import SchemaError, ValidationError, validate
 import webob
-from omageclient.cluster import ClusterAPI
-from omageclient.app import AppAPI
-from omageclient.project import ProjectAPI
+from omegaclient.cluster import ClusterAPI
+from omegaclient.app import AppAPI
+from omegaclient.project import ProjectAPI
 import copy
 
 

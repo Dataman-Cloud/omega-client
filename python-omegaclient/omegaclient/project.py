@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from omageclient.utils import url_maker
+from omegaclient.utils import url_maker
 
 class ProjectAPI(object):
     """Project controllers for response projects apis."""

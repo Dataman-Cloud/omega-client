@@ -23,12 +23,22 @@ class HTTPClient(object):
     """Http client for send http requests"""
 
     def __init__(self, server_url, email, password):
-        self._base_url = "{}/{}".format(server_url, API_VERSION)
+        self._base_url = self.get_url(server_url)
         self._email = email
         self._password = password
-        self._token = self.get_token()
         self._session = None
+        self._token = None
         self.timeout = 86400
+
+        self.get_token()
+
+    @staticmethod
+    def get_url(server_url):
+        """Generate access url"""
+
+        if server_url.endswith("/"):
+            return server_url + API_VERSION.lstrip("/")
+        return server_url + API_VERSION
 
     def get_session(self):
         """Get request session"""
@@ -38,12 +48,15 @@ class HTTPClient(object):
         return self._session
 
     def get_token(self):
-        """Get user auth token"""
+        """Obtain user auth token"""
 
-        resp = self.post("/auth", data={'email': self._email,
-                                        'password': self._password})
+        with self.get_session() as session:
+            resp = session.request("POST", self._base_url + "/auth",
+                                   data={"email": self._email,
+                                         "password": self._password})
 
-        return resp.json()['data']['token']
+            print(resp.json())
+            self._token = resp.json()['data']['token']
 
     def request(self, url, method, **kwargs):
         """Send request"""

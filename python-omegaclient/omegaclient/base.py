@@ -12,21 +12,3 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
-import os
-from functools import reduce
-from omegaclient.client import HTTPClient
-from omegaclient.utils import url_maker
-
-API_VERSION= "/api/v3"
-
-class Base(object):
-    """base object for the controllers"""
-
-    def __init__(self, url, token, session=None): 
-        self.http_client = HTTPClient(url_maker(url, API_VERSION), token)
-                         
-
-
-
-

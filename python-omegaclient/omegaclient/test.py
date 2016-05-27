@@ -7,7 +7,8 @@ from __init__ import OmegaClient
 class OmegaClientTest(unittest.TestCase):
 
     def setUp(self):
-        self.client = OmegaClient('http://devforward.dataman-inc.net', 'mgniu@dataman-inc.com', 'do-not-tell-you') 
+        self.client = OmegaClient('http://devforward.dataman-inc.net',
+                                  'mgniu@dataman-inc.com', 'Nmg1769815')
         self.pp = pprint.PrettyPrinter(indent=4)
 
     def tearDown(self):
