@@ -69,6 +69,18 @@ python3 setup.py install
 
 ```
 
+#### update_cluster
+```
+  Updated cluster information. currently only supported modifing the cluster name.
+  
+  arguments: cluster_id - 1000
+             kwargs     - { "name": "new_cluster_name" }
+  
+  returns: { "code": 0 }
+  
+  
+```
+
 #### get_node_identifier
 
 ```
