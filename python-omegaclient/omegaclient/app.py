@@ -13,10 +13,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from omeageclient.utils import url_maker
+from omegaclient.utils import url_maker
+from omegaclient.client import OmegaClient
 
 
-class AppAPI(object):
+class AppAPI(OmegaClient):
 
     def __init__(self, http):
         self.http = http
