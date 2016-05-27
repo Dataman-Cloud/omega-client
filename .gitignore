@@ -1,0 +1,7 @@
+.idea
+*.py[co]
+*.swp
+.ropeproject/*
+python-omegaclient/build/*
+python-omegaclient/dist/*
+python-omegaclient/omegaclient.egg-info/*
