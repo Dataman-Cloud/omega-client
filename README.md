@@ -31,7 +31,7 @@ python3 setup.py install
 #### get_clusters
 
  ```
-  List all clusters for specified user
+  List all clusters
 
   arguments: None
 
@@ -49,7 +49,7 @@ python3 setup.py install
 #### delete_cluster
 
 ```
-  Delete specified cluster
+  Delete cluster
 
   arguments: cluster_id
 
@@ -87,7 +87,7 @@ python3 setup.py install
 #### get_cluster_node
 
 ```
-  List node information for specified cluster.
+  List node information
 
   arguments:
            cluster_id
@@ -120,7 +120,7 @@ python3 setup.py install
 #### update_cluster_node
 
 ```
-  Updated node information for specified cluster
+  Updated node information
 
   arguments:
            cluster_id
@@ -139,7 +139,7 @@ python3 setup.py install
 #### get_node_metrics
 
 ```
-  Retrive metrics for node 
+  Retrive node metrics
 
   arguments:
             cluster_id
@@ -157,7 +157,7 @@ python3 setup.py install
 #### update_node_service
 
 ```
-  Reset or restart service on speicified node
+  Reset or restart service on node
 
   arguments:
            cluster_id
