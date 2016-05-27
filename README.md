@@ -44,6 +44,7 @@ python3 setup.py install
   arguments: cluster_id
 
   returns: cluster dictionary
+```
 
 * ### delete_cluster
 
@@ -53,6 +54,8 @@ python3 setup.py install
   arguments: cluster_id
 
   returns: None
+
+```
 
 * ### create_cluster
 
@@ -64,6 +67,8 @@ python3 setup.py install
              group_id: - int 
 
   returns: None
+
+```
 
 * ### get_node_identifier
 
