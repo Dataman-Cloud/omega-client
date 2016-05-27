@@ -13,53 +13,140 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import copy
+from jsonschema import SchemaError, ValidationError, validate
 from omegaclient.utils import url_maker
+import webob
 
 
 class AppAPI(object):
+    """App associated APIs"""
 
-    def __init__(self, http):
-        self.http = http
+    def get_cluster_apps(self, cluster_id, **kwargs):
+        """List all apps for speicified cluster"""
+        return self.http.get(url_maker("/clusters", cluster_id, "apps"),
+                             **kwargs)
 
-    def index(self, **kwargs):
+    def create_cluster_apps(self, cluster_id, **kwargs):
+        """Create app under speicified cluster
+
+        :param cluster_id: Cluster identifier
+        :param data: Dictionary to send in the body of the request.
+
         """
-        While cluster_id is None, list all apps belong to specified users;
-        other wise list all apps belongs to specified users and specified
-        clusters.
-        """
-        if 'cluster_id' in kwargs:
-            cluster_id = kwargs['cluster_id']
-            del kwargs['cluster_id']
-            return self.http.get(url_maker("/clusters", cluster_id, "apps"),
-                                 **kwargs)
-        return self.http.get("/apps", **kwargs)
 
-    def show(self, cluster_id, app_id):
-        """List specified app"""
+        # NOTE(mgniu): `deep copy or shallow copy? i'm confused.
+        data = copy.deepcopy(kwargs)
+
+        schema = {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "instances": {"type": "number"},
+                "volumes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "hostPath": {"type": "string"},
+                            "containerPath": {"type": "string"},
+                         },
+                     },
+                 },
+                "portMappings": {
+                     "type": "array",
+                     "items": {
+                         "type": "object",
+                         "properties": {
+                             "appPort": {"type": "number"},
+                             "protocol": {"type": "number"},
+                             "isUri": {"type": "number"},
+                             "type": {"type": "number"},
+                             "mapPort": {"type": "number"},
+                             "uri": {"type": "string"},
+                          },
+                      },
+                   },
+                "cpus": {"type": "number"},
+                "mem": {"type": "number"},
+                "cmd": {"type": "string"},
+                "envs": {
+                       "type": "array",
+                       "items": {
+                           "type": "object",
+                           "properties": {
+                               "key": {"type": "string"},
+                               "value": {"type": "string"},
+                            },
+                        },
+                   },
+                "imageName": {"type": "string"},
+                "imageVersion": {"type": "string"},
+                "forceImage": {"type": "boolean"},
+                "network": {"type": "string"},
+                "constraints": {
+                       "type": "array",
+                       "items": {
+                           "type": "array",
+                           "items": {"type": "string"},
+                       },
+                   },
+                "parameters": {
+                       "type": "array",
+                       "items": {
+                           "type": "object",
+                           "properties": {
+                               "key": {"type": "string"},
+                               "value": {"type": "string"},
+                           },
+                       },
+                   }
+            }
+        }
+        try:
+            validate(data, schema)
+        except (SchemaError, ValidationError):
+            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+
+        return self.http.post(cluster_id, data=data)
+
+    def get_cluster_app(self, cluster_id, app_id):
+        """List specified app information under specified cluster"""
+
         return self.http.get(url_maker("/clusters", cluster_id,
                                        "apps", app_id))
 
-    def create(self, cluster_id, body):
-        """Create new app"""
-        return self.http.post(url_maker("/clusters", cluster_id, "apps"),
-                              data=body)
+    def delete_cluster_app(self, cluster_id, app_id):
+        """Delete speicified app under specified cluster"""
 
-    def delete(self, cluster_id, app_id, version_id=None):
-        """
-        While version_id is none, delete specified app; other wise delete
-        specified versions for specified app
-        """
-        if version_id is not None:
-            return self.http.delete(url_maker("/clusters", cluster_id,
-                                              "apps", app_id))
-        return self.http.delete(url_maker("/clusters", cluster_id, "apps",
-                                          app_id, "versions", version_id))
+        return self.http.delete(url_maker("/clusters", cluster_id,
+                                          "apps", app_id))
 
-    def update(self, cluster_id, app_id, **kwargs):
-        """
-        While kwargs contains `method`, updated app's status(such as stop.
-        start. etc.); other wise updated app's information(such as name. etc.)
-        """
+    def get_user_apps(self, **kwargs):
+        """List all apps belong to specified user."""
+
+        return self.http.get("/apps", **kwargs)
+
+    def get_user_apps_status(self):
+        """List all app's status"""
+
+        return self.http.get("/app/status")
+
+    def get_app_versions(self, cluster_id, app_id):
+        """List all history versions for app"""
+
+        return self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
+                                       "versions"))
+
+    def delete_app_version(self, cluster_id, app_id):
+        """Delete app version"""
+
+        return self.http.delete(url_maker("/clusters", cluster_id,
+                                          "apps", app_id))
+
+    def update_cluster_app(self, cluster_id, app_id, **kwargs):
+        """Updated app configuration"""
+
         if 'method' in kwargs:
             return self.http.patch(url_maker("/clusters", cluster_id,
                                              "apps", app_id),
@@ -67,21 +154,14 @@ class AppAPI(object):
         return self.http.put(url_maker("/clusters", cluster_id, "apps",
                                        app_id), data=kwargs)
 
-    def events(self, cluster_id, app_id):
-        """List all operation logs for specfied app"""
-        return self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
-                                       "events"))
+    def get_app_instances(self, cluster_id, app_id):
+        """List all app instances"""
 
-    def instances(self, cluster_id, app_id):
-        """List all instances for specified app"""
         return self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
                                        "tasks"))
 
-    def versions(self, cluster_id, app_id):
-        """List all history versions for specified app"""
-        return self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
-                                       "versions"))
+    def get_app_events(self, cluster_id, app_id):
+        """List all app events"""
 
-    def status(self):
-        """List status for all apps of specified users"""
-        return self.http.get("/app/status")
+        return self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
+                                       "events"))
