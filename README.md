@@ -26,7 +26,9 @@ python3 setup.py install
 ```
 ## APIS
 
-* ### get_clusters
+### Cluster
+
+#### get_clusters
 
  ```
   List all clusters for specified user
@@ -35,8 +37,7 @@ python3 setup.py install
 
   returns: clusters list
 ```
-
-* ### get_cluster
+#### get_cluster
 
 ```
   List single cluster's information
@@ -45,8 +46,7 @@ python3 setup.py install
 
   returns: cluster dictionary
 ```
-
-* ### delete_cluster
+#### delete_cluster
 
 ```
   Delete specified cluster
@@ -56,8 +56,7 @@ python3 setup.py install
   returns: None
 
 ```
-
-* ### create_cluster
+#### create_cluster
 
 ```
   Create new cluster.
@@ -70,7 +69,7 @@ python3 setup.py install
 
 ```
 
-* ### get_node_identifier
+#### get_node_identifier
 
 ```
   Generated new node identifier. this identifier will be used for add new node.
@@ -85,7 +84,7 @@ python3 setup.py install
            }
 ```
 
-* ### get_cluster_node
+#### get_cluster_node
 
 ```
   List node information for specified cluster.
@@ -118,7 +117,7 @@ python3 setup.py install
           }
 ```
 
-* ### update_cluster_node
+#### update_cluster_node
 
 ```
   Updated node information for specified cluster
@@ -137,7 +136,7 @@ python3 setup.py install
           401
 ```
 
-* ### get_node_metrics
+#### get_node_metrics
 
 ```
   Retrive metrics for node 
@@ -155,7 +154,7 @@ python3 setup.py install
           } 
 ```
 
-* ### update_node_service
+#### update_node_service
 
 ```
   Reset or restart service on speicified node
@@ -169,7 +168,7 @@ python3 setup.py install
   returns: { "code": 0 }
 ```
 
-* ### create_node
+#### create_node
 
 ```
   Add new node for cluster identified by `cluster_id`
@@ -179,7 +178,7 @@ python3 setup.py install
   returns: { "code": 0 }
 ```
 
-* ### delete_nodes
+#### delete_nodes
 
 ```
   Delete single node or multiple nodes
