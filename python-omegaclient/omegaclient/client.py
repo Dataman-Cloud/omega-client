@@ -13,8 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import requests
 import json
+import requests
 
 API_VERSION = "/api/v3"
 
@@ -51,11 +51,10 @@ class HTTPClient(object):
         """Obtain user auth token"""
 
         with self.get_session() as session:
+            data = {"email": self._email, "password": self._password}
             resp = session.request("POST", self._base_url + "/auth",
-                                   data={"email": self._email,
-                                         "password": self._password})
+                                   data=json.dumps(data))
 
-            print(resp.json())
             self._token = resp.json()['data']['token']
 
     def request(self, url, method, **kwargs):
