@@ -200,5 +200,207 @@ python3 setup.py install
   returns: { "code": 0 }
 ```
             
+### App
 
+#### get_cluster_apps
+```
+List all apps in cluster
+```
+```
+arguments: cluster_id
+
+returns: apps list
+```
+
+#### create_cluster_apps
+```
+Created app in cluster
+```
+```
+arguments: cluster_id - 100
+           kwargs: - json object contains all parameters for app creation
+
+returns: app id 
+```
+
+#### get_cluster_app
+```
+Show app information
+```
+```
+arguments: cluster_id - 100
+           app_id     - 699
+          
+returns: Dictionary contains app information
+```
+
+#### delete_cluster_app
+```
+Delete app
+```
+```
+arguments: cluster_id - 100
+           app_id     - 689
+           
+returns: None
+```
+#### get_user_apps
+```
+List all apps belong to a user
+```
+```
+arguments: None
+
+returns: List contains all apps
+```
+
+#### get_user_apps_status
+```
+List all app's status
+```
+```
+arguments: None
+
+return: List contains all app status
+```
+#### get_app_versions
+```
+List all history versions for app
+```
+```
+arguments: cluster_id - 100
+           app_id     - 101
+           
+returns: Dictionary contains all versions
+```
+#### delete_app_version
+```
+Delete app version
+```
+```
+arguments: cluster_id - 100
+           app_id     - 899
+           version_id - 12
+          
+returns: None
+```
+
+#### update_cluster_app
+```
+Updated app configuration
+```
+```
+arguments: cluster_id - 100
+           app_id     - 688
+           kwargs     - son object contains all app configurations
+
+returns: None
+```
+#### get_app_instances
+```
+List all app instances
+```
+```
+arguments: cluster_id - 100
+           app_id     - 999
+           
+returns: List contains all versions
+```
+
+#### get_app_events
+```
+List all app events
+```
+```
+arguments: cluster_id - 100
+           app_id     - 345
+           
+returns: List contains all events
+```
+
+### Project
+
+#### get_projects
+```
+List all projects(images)
+```
+```
+arguments: None
+
+returns: List contains all projects
+```
+
+#### create_project
+```
+Create new project
+```
+```
+arguments: kwargs - json object contains all parameters for project creation
+
+returns: new project id
+```
+
+#### delete_project
+```
+Delete project
+```
+```
+arguments: project_id - 109
+
+returns: None
+```
+
+#### get_project
+```
+Show project information
+```
+```
+arguments: project_id - 109
+
+returns: Dictionary contains project information
+```
+
+#### update_project
+```
+Partially update project's information
+```
+```
+arguments: project_id - 109
+           kwargs - son object contains update information
+
+retuns: None
+```
+#### get_project_builds
+```
+List all build versions
+```
+```
+arguments: project_id
+
+returns: List contains all builds
+```
+
+#### get_project_build_logs
+```
+List all build logs
+```
+```
+arguments: project_id - 109
+           build_num  - 88
+           job_id     - 99
+          
+returns: List contains all build logs
+```
+
+#### get_project_build_stream
+```
+Retrieve build stream
+```
+```
+arguments: project_id - 109
+           build_num  - 99
+           job_id     - 88
+           
+returns: build stream
+```
 
