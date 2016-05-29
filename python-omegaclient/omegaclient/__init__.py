@@ -29,3 +29,14 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin):
         self.http = HTTPClient(server_url, email, password)
 
         super(OmegaClient, self).__init__()
+
+    @staticmethod
+    def process_data(resp):
+        """Processing data response from Omega API."""
+
+        data = resp.json()
+
+        if 'data' in data:
+            return data['data']
+
+        return data

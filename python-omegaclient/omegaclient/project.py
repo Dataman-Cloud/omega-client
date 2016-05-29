@@ -24,11 +24,16 @@ class ProjectMixin(object):
 
     def get_projects(self):
         """list all projects(images) for speicified user."""
-        return self.http.get("/projects")
+        resp = self.http.get("/projects")
+
+        return self.process_data(resp)
 
     def get_project(self, project_id):
         """show project details."""
-        return self.http.get(url_maker("/projects", project_id))
+
+        resp = self.http.get(url_maker("/projects", project_id))
+
+        return self.process_data(resp)
 
     def create_project(self, **kwargs):
         """create new project."""
@@ -55,7 +60,9 @@ class ProjectMixin(object):
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        return self.http.post("/projects", data=kwargs)
+        resp = self.http.post("/projects", data=kwargs)
+
+        return self.process_data(resp)
 
     def update_project(self, project_id, **kwargs):
         """Update specified project information."""
@@ -86,16 +93,22 @@ class ProjectMixin(object):
     def get_project_builds(self, project_id):
         """list all builds for project"""
 
-        return self.http.get(url_maker("/projects", project_id, "builds"))
+        resp = self.http.get(url_maker("/projects", project_id, "builds"))
+
+        return self.process_data(resp)
 
     def get_build_logs(self, project_id, build_num, job_id):
         """List all build logs for project"""
 
-        return self.http.get(url_maker("/projects", project_id, "builds",
+        resp = self.http.get(url_maker("/projects", project_id, "builds",
                                        build_num, job_id, "logs"))
+
+        return self.process_data(resp)
 
     def get_build_stream(self, project_id, build_num, job_id):
         """List all build text stream for project"""
 
-        return self.http.get(url_maker("/projects", project_id, "builds",
+        resp = self.http.get(url_maker("/projects", project_id, "builds",
                                        build_num, job_id, "stream"))
+
+        return self.process_data(resp)

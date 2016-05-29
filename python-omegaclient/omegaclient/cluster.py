@@ -23,12 +23,16 @@ class ClusterMixin(object):
     def get_clusters(self):
         """List all clusters"""
 
-        return self.http.get("/clusters")
+        resp = self.http.get("/clusters")
+
+        return self.process_data(resp)
 
     def get_cluster(self, cluster_id):
         """List single cluster's information"""
 
-        return self.http.get(url_maker("/clusters", cluster_id))
+        resp = self.http.get(url_maker("/clusters", cluster_id))
+
+        return self.process_data(resp)
 
     def create_cluster(self, name, cluster_type, group_id):
         """Create new cluster.
@@ -57,7 +61,9 @@ class ClusterMixin(object):
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        return self.http.post("/clusters", data=data)
+        resp = self.http.post("/clusters", data=data)
+
+        return self.process_data(resp)
 
     def delete_cluster(self, cluster_id):
         """Delete cluster"""
@@ -73,14 +79,18 @@ class ClusterMixin(object):
         """Generated new node identifier. this identifier will be
         used for add new node."""
 
-        return self.http.get(url_maker("/clusters", cluster_id,
+        resp = self.http.get(url_maker("/clusters", cluster_id,
                                        "new_node_identifier"))
+
+        return self.process_data(resp)
 
     def get_cluster_node(self, cluster_id, node_id):
         """List node information"""
 
-        return self.http.get(url_maker("/clusters", cluster_id, "nodes",
+        resp = self.http.get(url_maker("/clusters", cluster_id, "nodes",
                                        node_id))
+
+        return self.process_data(resp)
 
     def update_cluster_node(self, cluster_id, node_id, **kwargs):
         """Updated node information"""
@@ -91,8 +101,10 @@ class ClusterMixin(object):
     def get_node_metrics(self, cluster_id, node_id):
         """Retrive node metrics"""
 
-        return self.http.get(url_maker("/clusters", cluster_id, "nodes",
+        resp = self.http.get(url_maker("/clusters", cluster_id, "nodes",
                                        node_id))
+
+        return self.process_data(resp)
 
     def update_node_service(self, cluster_id, node_id, service_name, **kwargs):
         """Reset or restart service on node"""
