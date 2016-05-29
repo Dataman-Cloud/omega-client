@@ -19,7 +19,7 @@ from omegaclient.utils import url_maker
 import webob
 
 
-class AppAPI(object):
+class AppMixin(object):
     """App associated APIs"""
 
     def get_cluster_apps(self, cluster_id, **kwargs):

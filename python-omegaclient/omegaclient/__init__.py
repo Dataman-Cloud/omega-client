@@ -14,14 +14,14 @@
 #    under the License.
 
 from omegaclient.client import HTTPClient
-from omegaclient.project import ProjectAPI
-from omegaclient.app import AppAPI
-from omegaclient.cluster import ClusterAPI
+from omegaclient.project import ProjectMixin
+from omegaclient.app import AppMixin
+from omegaclient.cluster import ClusterMixin
 
 
-class OmegaClient(ProjectAPI, AppAPI, ClusterAPI):
+class OmegaClient(ProjectMixin, AppMixin, ClusterMixin):
     """
-    Client for user to use Dataman Cloud
+    Client for user to use Dataman Cloud.
     """
 
     def __init__(self, server_url, email, password):
