@@ -19,7 +19,7 @@ from jsonschema import SchemaError, ValidationError, validate
 from omegaclient.utils import url_maker
 
 
-class ProjectAPI(object):
+class ProjectMixin(object):
     """Project controllers for response projects apis."""
 
     def get_projects(self):

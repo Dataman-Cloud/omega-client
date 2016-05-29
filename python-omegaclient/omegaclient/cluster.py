@@ -18,7 +18,7 @@ from jsonschema import SchemaError, ValidationError, validate
 from omegaclient.utils import url_maker
 
 
-class ClusterAPI(object):
+class ClusterMixin(object):
 
     def get_clusters(self):
         """List all clusters"""
