@@ -409,4 +409,7 @@ arguments: kwargs - json object contains the following keys:
                     from      - offset for page pagination
                     size      - log counts for page pagination
                     keyword   - keyword for search
+                
+returns: dictionary contains all app logs
 ```
+`from` and `size` are used for page pagination
