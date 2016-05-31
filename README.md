@@ -88,12 +88,8 @@ python3 setup.py install
 
   arguments: cluster_id
 
-  returns: {
-               "code": 0,
-               "data": {
-                   "identifier": "string"
-               }
-           }
+  returns: { "identifier": "string" }
+  
 ```
 
 #### get_cluster_node
@@ -105,28 +101,27 @@ python3 setup.py install
            cluster_id
            node_id
 
-  returns:
-          {
-            "code": 0,
-            "data": {
-              "cluster": {
-                "id": 0,
-                "name": "string",
-                "cluster_type": "string"
-              },
-              "id": "string",
-              "name": "string",
-              "status": "string",
-              "created_at": "string",
-              "ip": "string",
-              "services": [
-                {
-                  "name": "string",
-                  "status": "string"
-                }
-              ]
-            }
-          }
+  returns: dictionary contans node information
+  
+    
+  {
+        "cluster": {
+            "id": 0,
+            "name": "string",
+            "cluster_type": "string"
+        },
+        "id": "string",
+        "name": "string",
+        "status": "string",
+        "created_at": "string",
+        "ip": "string",
+        "services": [
+            {
+            "name": "string",
+            "status": "string"
+        }
+        ]
+}
 ```
 
 #### update_cluster_node
@@ -157,13 +152,7 @@ python3 setup.py install
             cluster_id
             node_id
 
-  returns:
-          {
-            "code": 0,
-            "data": [
-                {}
-            ]
-          } 
+  returns: metrics list
 ```
 
 #### update_node_service
@@ -337,7 +326,7 @@ Create new project
 ```
 arguments: kwargs - json object contains all parameters for project creation
 
-returns: new project id
+returns: dictionary contains new project information
 ```
 
 #### delete_project
@@ -366,7 +355,7 @@ Partially update project's information
 ```
 ```
 arguments: project_id - 109
-           kwargs - son object contains update information
+           kwargs - json object contains update information
 
 retuns: None
 ```
@@ -404,3 +393,20 @@ arguments: project_id - 109
 returns: build stream
 ```
 
+### Logs
+
+#### get_app_logs
+```
+List all app runtime logs
+```
+```
+arguments: kwargs - json object contains the following keys:
+                    userid    - user id
+                    clusterid - cluster id
+                    appname   - app name
+                    start     - start time
+                    end       - end time
+                    from      - offset for page pagination
+                    size      - log counts for page pagination
+                    keyword   - keyword for search
+```

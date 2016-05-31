@@ -19,13 +19,16 @@ from omegaclient.utils import url_maker
 import webob
 
 
-class AppAPI(object):
+class AppMixin(object):
     """App associated APIs"""
 
     def get_cluster_apps(self, cluster_id, **kwargs):
         """List all apps for speicified cluster"""
-        return self.http.get(url_maker("/clusters", cluster_id, "apps"),
+
+        resp = self.http.get(url_maker("/clusters", cluster_id, "apps"),
                              **kwargs)
+
+        return self.process_data(resp)
 
     def create_cluster_apps(self, cluster_id, **kwargs):
         """Create app under speicified cluster
@@ -108,13 +111,17 @@ class AppAPI(object):
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        return self.http.post(cluster_id, data=data)
+        resp = self.http.post(cluster_id, data=data)
+
+        return self.process_data(resp)
 
     def get_cluster_app(self, cluster_id, app_id):
         """List specified app information under specified cluster"""
 
-        return self.http.get(url_maker("/clusters", cluster_id,
+        resp = self.http.get(url_maker("/clusters", cluster_id,
                                        "apps", app_id))
+
+        return self.process_data(resp)
 
     def delete_cluster_app(self, cluster_id, app_id):
         """Delete speicified app under specified cluster"""
@@ -125,18 +132,24 @@ class AppAPI(object):
     def get_user_apps(self, **kwargs):
         """List all apps belong to specified user."""
 
-        return self.http.get("/apps", **kwargs)
+        resp = self.http.get("/apps", **kwargs)
+
+        return self.process_data(resp)
 
     def get_user_apps_status(self):
         """List all app's status"""
 
-        return self.http.get("/app/status")
+        resp = self.http.get("/app/status")
+
+        return self.process_data(resp)
 
     def get_app_versions(self, cluster_id, app_id):
         """List all history versions for app"""
 
-        return self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
+        resp = self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
                                        "versions"))
+
+        return self.process_data(resp)
 
     def delete_app_version(self, cluster_id, app_id):
         """Delete app version"""
@@ -157,11 +170,15 @@ class AppAPI(object):
     def get_app_instances(self, cluster_id, app_id):
         """List all app instances"""
 
-        return self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
+        resp = self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
                                        "tasks"))
+
+        return self.process_data(resp)
 
     def get_app_events(self, cluster_id, app_id):
         """List all app events"""
 
-        return self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
+        resp = self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
                                        "events"))
+
+        return self.process_data(resp)
