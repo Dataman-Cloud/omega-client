@@ -16,6 +16,6 @@
 import os
 from functools import reduce
 
-def url_maker(*args):
-    return reduce(os.path.join, args)
 
+def url_maker(*args):
+    return reduce(os.path.join, map(str, args))
