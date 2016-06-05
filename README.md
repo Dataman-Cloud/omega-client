@@ -498,3 +498,40 @@ arguments: kwargs(optinal) - json object contains all query parameters:
 returns: List contains all alarm events.
 ```
 `per_page` and `page` are used for page pagination.
+
+### Metrics
+
+#### get_app_history_metrics
+
+```
+arguments: cluster_id
+           app_id
+           starttime (optional) - default one hour ahead of the current time in nanosecond
+           endtime (optional) - default current time in nanosecond
+
+returns: Dictionary contains metrics information.
+```
+
+#### get_app_requests
+```
+arguments: cluster_id
+           app_id
+           starttime  - start time in nanosecond
+           endtime - end time in nanosecond
+
+returns: Dictionary contains metrics information.
+```
+#### get_app_live_metrics
+```
+arguments: cluster_id
+           app_id
+
+returns: Dictionary contains metrics information.
+```
+
+#### get_cluster_resource_metrics
+```
+arguments: cluster_id
+
+returns: Dictionary contains cluster metrics information.
+```
