@@ -413,3 +413,78 @@ arguments: kwargs - json object contains the following keys:
 returns: dictionary contains all app logs
 ```
 `from` and `size` are used for page pagination
+
+### Alert
+
+#### get_tasks
+```
+Lists all the policies that the user created.
+```
+```
+arguments: kwargs(optinal) - json object contains all query parameters:
+		   
+           keyword - search keyword
+           sort_by - sort field
+           order - ascending or descending
+           per_page - entries per page 
+           page - page offset
+           
+returns: List contains all user policies.
+```
+`per_page` and `page` are used for page pagination.
+
+#### create_task
+```
+Created new policy.
+```
+```
+arguments: json object contains all parameters for policy creation.
+
+returns: Dictionary contans new policy information.
+```
+
+#### update_task
+```
+Updated policy information or status.
+```
+```
+arguments: kwargs - json object
+
+returns: None
+```
+
+#### get_task
+```
+List policy information.
+```
+```
+arguments: policy_id - policy's identifier
+
+returns: Dictionary contains policy information
+```
+
+#### delete_task
+```
+Delete policy
+```
+```
+arguments: policy_id - policy's identifier
+
+returns: None
+```
+#### get_events
+```
+List all alarm event's histories.
+```
+```
+arguments: kwargs(optinal) - json object contains all query parameters:
+		   
+           keyword - search keyword
+           sort_by - sort field
+           order - ascending or descending
+           per_page - entries per page 
+           page - page offset
+           
+returns: List contains all alarm events.
+```
+`per_page` and `page` are used for page pagination.
