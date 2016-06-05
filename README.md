@@ -443,12 +443,22 @@ arguments: json object contains all parameters for policy creation.
 returns: Dictionary contans new policy information.
 ```
 
-#### update_task
+#### put_task
 ```
-Updated policy information or status.
+Updated policy information.
 ```
 ```
-arguments: kwargs - json object
+arguments: kwargs -json object
+
+returns: None
+```
+#### patch_task
+```
+Updated policy status.
+```
+```
+arguments:policy_id policy identifier 
+          kwargs - json object
 
 returns: None
 ```
