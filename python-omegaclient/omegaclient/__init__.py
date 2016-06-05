@@ -18,9 +18,12 @@ from omegaclient.project import ProjectMixin
 from omegaclient.app import AppMixin
 from omegaclient.cluster import ClusterMixin
 from omegaclient.logs import LogMixin
+from omegaclient.alert import AlertMixin
+from omegaclient.metrics import MetricsMixin
 
 
-class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin):
+class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
+                  MetricsMixin):
     """
     Client for user to use Dataman Cloud.
     """
