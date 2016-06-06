@@ -21,6 +21,8 @@ from omegaclient.logs import LogMixin
 from omegaclient.alert import AlertMixin
 from omegaclient.metrics import MetricsMixin
 
+from omegaclient.exceptions import OmegaException
+
 
 class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
                   MetricsMixin):
@@ -43,4 +45,8 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
         if 'data' in data:
             return data['data']
 
+        if 'code' in data:
+            if data['code'] != 0:
+                raise OmegaException(message="error",
+                                     status_code=data['code'])
         return data
