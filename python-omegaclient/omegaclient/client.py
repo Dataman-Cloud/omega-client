@@ -69,7 +69,7 @@ class HTTPClient(object):
             kwargs['headers']['Content-Type'] = 'application/json'
             kwargs['data'] = json.dumps(kwargs['data'])
 
-        if 'param' in kwargs:
+        if 'params' in kwargs:
             kwargs['params'] = json.dumps(kwargs['params'])
 
         if self.timeout is not None:
