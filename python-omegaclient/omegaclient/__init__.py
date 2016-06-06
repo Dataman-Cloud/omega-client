@@ -23,6 +23,10 @@ from omegaclient.metrics import MetricsMixin
 
 from omegaclient.exceptions import OmegaException
 
+import requests
+from omegaclient.utils import url_maker
+import json
+
 
 class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
                   MetricsMixin):
@@ -32,9 +36,19 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
 
     def __init__(self, server_url, email, password):
 
+        self.server_url = server_url
+
         self.http = HTTPClient(server_url, email, password)
 
         super(OmegaClient, self).__init__()
+
+    def get_app_logs(self, **kwargs):
+        """Retrive app runtime logs"""
+
+        resp = self.requests.post(url_maker(self.server_url, "/es/index"),
+                                  data=json.dumps(kwargs))
+
+        return self.process_data(resp)
 
     @staticmethod
     def process_data(resp):
