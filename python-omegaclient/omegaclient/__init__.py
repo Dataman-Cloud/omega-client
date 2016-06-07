@@ -23,13 +23,15 @@ from omegaclient.cluster import ClusterMixin
 from omegaclient.logs import LogMixin
 from omegaclient.alert import AlertMixin
 from omegaclient.metrics import MetricsMixin
+from omegaclient.user import UserMixin
+from omegaclient.auth import AuthMixin
 
 from omegaclient.exceptions import OmegaException
 from omegaclient.utils import url_maker
 
 
 class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
-                  MetricsMixin):
+                  MetricsMixin, UserMixin, AuthMixin):
     """
     Client for user to use Dataman Cloud.
     """

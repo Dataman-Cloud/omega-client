@@ -26,6 +26,29 @@ python3 setup.py install
 ```
 ## APIS
 
+### Auth
+
+#### get_token
+```
+Fetch user token
+```
+```
+arguments: email - user email
+           passed - user passed
+           
+returns: Dicitonary contains token
+```
+
+### User
+```
+Retrieve user information
+```
+```
+arguments: None
+
+returns: Dictionary contains user information
+```
+
 ### Cluster
 
 #### get_clusters
