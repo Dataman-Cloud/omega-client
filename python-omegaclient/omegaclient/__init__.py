@@ -13,6 +13,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import json
+import requests
+
 from omegaclient.client import HTTPClient
 from omegaclient.project import ProjectMixin
 from omegaclient.app import AppMixin
@@ -22,10 +25,7 @@ from omegaclient.alert import AlertMixin
 from omegaclient.metrics import MetricsMixin
 
 from omegaclient.exceptions import OmegaException
-
-import requests
 from omegaclient.utils import url_maker
-import json
 
 
 class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
@@ -45,8 +45,8 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
     def get_app_logs(self, **kwargs):
         """Retrive app runtime logs"""
 
-        resp = self.requests.post(url_maker(self.server_url, "/es/index"),
-                                  data=json.dumps(kwargs))
+        resp = requests.post(url_maker(self.server_url, "/es/index"),
+                             data=json.dumps(kwargs))
 
         return self.process_data(resp)
 
@@ -56,11 +56,11 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
 
         data = resp.json()
 
-        if 'data' in data:
-            return data['data']
-
         if 'code' in data:
             if data['code'] != 0:
                 raise OmegaException(message="error",
                                      status_code=data['code'])
-        return data
+        try:
+            return data['data']
+        except KeyError:
+            return data
