@@ -19,27 +19,27 @@ from omegaclient.utils import url_maker
 class MetricsMixin(object):
     """Metrics associated apis"""
 
-    def get_app_history_metrics(self, cluster_id, app_id, **kwargs):
+    def get_app_history_metrics(self, cluster_id, app_alias):
         """List app history metrics"""
 
         resp = self.http.get(url_maker("/clusters", cluster_id, "apps",
-                                       app_id, "monitor"))
+                                       app_alias, "monitor"))
 
         return self.process_data(resp)
 
-    def get_app_requests(self, cluster_id, app_id, start_time, end_time):
+    def get_app_requests(self, cluster_id, app_alias):
         """List app's requests for per second"""
 
         resp = self.http.get(url_maker("/clusters", cluster_id, "apps",
-                                       app_id, "session"))
+                                       app_alias, "session"))
 
         return self.process_data(resp)
 
-    def get_app_live_metrics(self, cluster_id, app_id):
+    def get_app_live_metrics(self, cluster_id, app_alias):
         """List all living metrics"""
 
         resp = self.http.get(url_maker("/clusters", cluster_id, "apps",
-                                       app_id, "metrics"))
+                                       app_alias, "metrics"))
 
         return self.process_data(resp)
 
