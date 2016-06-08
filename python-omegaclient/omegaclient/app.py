@@ -182,3 +182,11 @@ class AppMixin(object):
                                        "events"))
 
         return self.process_data(resp)
+
+    def get_app_nodes(self, cluster_id, app_id):
+        """List all app instances."""
+
+        resp = self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
+                                       "appnodes"))
+
+        return self.process_data(resp)
