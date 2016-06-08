@@ -111,7 +111,8 @@ class AppMixin(object):
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        resp = self.http.post(cluster_id, data=data)
+        resp = self.http.post(url_maker("/clusters", cluster_id, "apps"),
+                              data=data)
 
         return self.process_data(resp)
 
