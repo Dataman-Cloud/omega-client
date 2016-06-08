@@ -64,6 +64,19 @@ class ProjectMixin(object):
 
         return self.process_data(resp)
 
+    def build_project(self, project_id, uid, image_name):
+        """Build project."""
+
+        data = {
+            "uid": uid,
+            "imageName": image_name,
+        }
+
+        resp = self.http.post(url_maker("/projects", project_id, "hook"),
+                              data=data)
+
+        return self.process_data(resp)
+
     def update_project(self, project_id, **kwargs):
         """Update specified project information."""
 
