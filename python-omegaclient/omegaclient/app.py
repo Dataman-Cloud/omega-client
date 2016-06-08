@@ -139,7 +139,7 @@ class AppMixin(object):
     def get_user_apps_status(self):
         """List all app's status"""
 
-        resp = self.http.get("/app/status")
+        resp = self.http.get("/apps/status")
 
         return self.process_data(resp)
 
