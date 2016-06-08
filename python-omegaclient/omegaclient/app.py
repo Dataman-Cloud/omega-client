@@ -152,11 +152,12 @@ class AppMixin(object):
 
         return self.process_data(resp)
 
-    def delete_app_version(self, cluster_id, app_id):
+    def delete_app_version(self, cluster_id, app_id, version_id):
         """Delete app version"""
 
         return self.http.delete(url_maker("/clusters", cluster_id,
-                                          "apps", app_id))
+                                          "apps", app_id, "versions",
+                                          version_id))
 
     def update_cluster_app(self, cluster_id, app_id, **kwargs):
         """Updated app configuration"""
