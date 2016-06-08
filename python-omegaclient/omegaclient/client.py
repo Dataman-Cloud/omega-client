@@ -57,7 +57,7 @@ class HTTPClient(object):
 
             self._token = resp.json()['data']['token']
 
-    def request(self, url, method, **kwargs):
+    def _request(self, url, method, **kwargs):
         """Send request"""
 
         kwargs.setdefault('headers', kwargs.get('headers', {}))
@@ -76,9 +76,19 @@ class HTTPClient(object):
             kwargs.setdefault('timeout', self.timeout)
 
         with self.get_session() as session:
-            resp = session.request(method, self._base_url + url, **kwargs)
+            resp = session.request(method, url, **kwargs)
 
         return resp
+
+    def request(self, url, method, **kwargs):
+        """Send requests with API Verison"""
+
+        return self._request(self._base_url + url, method, **kwargs)
+
+    def bare_request(self, url, method, **kwargs):
+        """Send requests without API Version."""
+
+        return self._request(url, method, **kwargs)
 
     def get(self, url, **kwargs):
         """Send a GET request. Returns :class:`requests.Response` object"""
