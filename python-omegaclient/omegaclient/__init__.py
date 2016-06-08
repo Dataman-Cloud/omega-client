@@ -48,7 +48,7 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
         """Retrive app runtime logs"""
 
         resp = self.http.bare_request(url_maker(self.server_url, "es/index"),
-                                      "POST", data=json.dumps(kwargs))
+                                      "POST", data=kwargs)
 
         return self.process_data(resp)
 
