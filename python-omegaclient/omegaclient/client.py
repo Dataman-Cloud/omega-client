@@ -22,9 +22,9 @@ API_VERSION = "/api/v3"
 class HTTPClient(object):
     """Http client for send http requests"""
 
-    def __init__(self, server_url, email, password):
+    def __init__(self, server_url, name, password):
         self._base_url = self.get_url(server_url)
-        self._email = email
+        self._name = name 
         self._password = password
         self._session = None
         self._token = None
@@ -51,7 +51,7 @@ class HTTPClient(object):
         """Obtain user auth token"""
 
         with self.get_session() as session:
-            data = {"email": self._email, "password": self._password}
+            data = {"name": self._name, "password": self._password}
             resp = session.request("POST", self._base_url + "/auth",
                                    data=json.dumps(data))
 

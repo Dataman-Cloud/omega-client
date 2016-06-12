@@ -17,11 +17,11 @@
 class AuthMixin(object):
     """Auth associated apis"""
 
-    def get_token(self, email, passwd):
+    def get_token(self, name, passwd):
         """List user info from token"""
 
         data = {
-            "email": email,
+            "name": name,
             "password": passwd
         }
 
