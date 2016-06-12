@@ -44,14 +44,6 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
 
         super(OmegaClient, self).__init__()
 
-    def get_app_logs(self, **kwargs):
-        """Retrive app runtime logs"""
-
-        resp = self.http.bare_request(url_maker(self.server_url, "es/index"),
-                                      "POST", data=kwargs)
-
-        return self.process_data(resp)
-
     @staticmethod
     def process_data(resp):
         """Processing data response from Omega API."""
