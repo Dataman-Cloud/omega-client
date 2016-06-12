@@ -22,7 +22,7 @@ class AlertMixin(object):
     def get_tasks(self, **kwargs):
         """Lists all the policies that the user created."""
 
-        resp = self.http.get("/alert/tasks", param=kwargs)
+        resp = self.http.get("/alert/tasks", params=kwargs)
 
         return self.process_data(resp)
 
@@ -58,7 +58,7 @@ class AlertMixin(object):
     def get_alarm_events(self, **kwargs):
         """List all alarm event's histories."""
 
-        resp = self.http.get("/alert/events", param=kwargs)
+        resp = self.http.get("/alert/events", params=kwargs)
 
         return self.process_data(resp)
         
