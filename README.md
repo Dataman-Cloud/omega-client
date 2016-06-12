@@ -304,7 +304,7 @@ Updated app configuration
 ```
 arguments: cluster_id - 100
            app_id     - 688
-           kwargs     - son object contains all app configurations
+           kwargs     - json object contains all app configurations
 
 returns: None
 ```
@@ -351,7 +351,16 @@ arguments: kwargs - json object contains all parameters for project creation
 
 returns: dictionary contains new project information
 ```
-
+#### build_project
+```
+Build image
+```
+```
+arguments: project_id 
+           uid
+           image_name
+returns: None
+```
 #### delete_project
 ```
 Delete project
@@ -528,7 +537,7 @@ returns: List contains all alarm events.
 
 ```
 arguments: cluster_id
-           app_id
+           app_alias
            starttime (optional) - default one hour ahead of the current time in nanosecond
            endtime (optional) - default current time in nanosecond
 
@@ -538,7 +547,7 @@ returns: Dictionary contains metrics information.
 #### get_app_requests
 ```
 arguments: cluster_id
-           app_id
+           app_alias
            starttime  - start time in nanosecond
            endtime - end time in nanosecond
 
@@ -547,7 +556,7 @@ returns: Dictionary contains metrics information.
 #### get_app_live_metrics
 ```
 arguments: cluster_id
-           app_id
+           app_alias
 
 returns: Dictionary contains metrics information.
 ```
