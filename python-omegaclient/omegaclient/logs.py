@@ -23,3 +23,10 @@ class LogMixin(object):
         resp = self.http.post("/es/index", data=kwargs)
 
         return self.process_data(resp)
+
+    def get_app_context(self, **kwargs):
+        """Retrive app context?"""
+
+        resp = self.http.post("/es/context", data=kwargs)
+
+        return self.process_data(resp)
