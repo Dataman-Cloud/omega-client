@@ -446,6 +446,21 @@ returns: dictionary contains all app logs
 ```
 `from` and `size` are used for page pagination
 
+#### get_app_context
+```
+List all app context
+```
+arguments: charges - json object contains the following keys:
+                     userid
+                     clusterid
+                     appname
+                     timestamp
+                     ipport
+                     counter
+                     source
+returns: dictionary contains all app context
+```
+
 ### Alert
 
 #### get_tasks
