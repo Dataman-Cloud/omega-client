@@ -450,6 +450,7 @@ returns: dictionary contains all app logs
 ```
 List all app context
 ```
+```
 arguments: charges - json object contains the following keys:
                      userid
                      clusterid
