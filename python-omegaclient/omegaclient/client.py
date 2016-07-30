@@ -22,12 +22,12 @@ API_VERSION = "/api/v3"
 class HTTPClient(object):
     """Http client for send http requests"""
 
-    def __init__(self, server_url, name, password):
+    def __init__(self, server_url, name, password, token=None):
         self._base_url = self.get_url(server_url)
         self._name = name 
         self._password = password
         self._session = None
-        self._token = None
+        self._token = token
         self.timeout = 86400
 
         self.get_token()
@@ -50,12 +50,16 @@ class HTTPClient(object):
     def get_token(self):
         """Obtain user auth token"""
 
-        with self.get_session() as session:
-            data = {"name": self._name, "password": self._password}
-            resp = session.request("POST", self._base_url + "/auth",
-                                   data=json.dumps(data))
+        if self._name and self._password:
+            with self.get_session() as session:
+                data = {"name": self._name, "password": self._password}
+                resp = session.request("POST", self._base_url + "/auth",
+                                       data=json.dumps(data))
 
-            self._token = resp.json()['data']['token']
+                if resp.json()['code'] == 0:
+                    self._token = resp.json()['data']['token']
+                else:
+                    print ('Ooops, authentication failed!')
 
     def _request(self, url, method, **kwargs):
         """Send request"""
@@ -64,6 +68,7 @@ class HTTPClient(object):
         kwargs['headers']['User-Agent'] = "API-CLIENT"
         kwargs['headers']['Accept'] = 'application/json'
         kwargs['headers']['Authorization'] = self._token
+        kwargs['headers']['Content-type'] = 'application/json'
 
         if 'data' in kwargs:
             kwargs['headers']['Content-Type'] = 'application/json'
@@ -77,7 +82,6 @@ class HTTPClient(object):
 
         with self.get_session() as session:
             resp = session.request(method, url, **kwargs)
-
         return resp
 
     def request(self, url, method, **kwargs):

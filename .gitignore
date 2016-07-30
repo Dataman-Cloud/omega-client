@@ -5,3 +5,5 @@
 python-omegaclient/build/*
 python-omegaclient/dist/*
 python-omegaclient/omegaclient.egg-info/*
+python-omegaclient/.sryapi-cli.json
+python-omegaclient/.coverage

@@ -16,7 +16,6 @@
 import copy
 from jsonschema import SchemaError, ValidationError, validate
 from omegaclient.utils import url_maker
-import webob
 
 
 class AppMixin(object):
@@ -108,8 +107,8 @@ class AppMixin(object):
         }
         try:
             validate(data, schema)
-        except (SchemaError, ValidationError):
-            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+        except (SchemaError, ValidationError) as e:
+            return e
 
         resp = self.http.post(url_maker("/clusters", cluster_id, "apps"),
                               data=data)
@@ -125,10 +124,11 @@ class AppMixin(object):
         return self.process_data(resp)
 
     def delete_cluster_app(self, cluster_id, app_id):
-        """Delete speicified app under specified cluster"""
+        """Delete specified app under specified cluster"""
 
-        return self.http.delete(url_maker("/clusters", cluster_id,
+        resp = self.http.delete(url_maker("/clusters", cluster_id,
                                           "apps", app_id))
+        return self.process_data(resp)
 
     def get_user_apps(self, **kwargs):
         """List all apps belong to specified user."""
@@ -155,22 +155,26 @@ class AppMixin(object):
     def delete_app_version(self, cluster_id, app_id, version_id):
         """Delete app version"""
 
-        return self.http.delete(url_maker("/clusters", cluster_id,
+        resp = self.http.delete(url_maker("/clusters", cluster_id,
                                           "apps", app_id, "versions",
                                           version_id))
+        return self.process_data(resp)
 
-    def update_cluster_app(self, cluster_id, app_id, **kwargs):
+    def update_cluster_app(self, cluster_id, app_id, http_method, **kwargs):
         """Updated app configuration"""
 
-        if 'method' in kwargs:
-            return self.http.patch(url_maker("/clusters", cluster_id,
+        if not http_method or http_method.lower() == 'patch':
+            resp = self.http.patch(url_maker("/clusters", cluster_id,
                                              "apps", app_id),
                                    data=kwargs)
-        return self.http.put(url_maker("/clusters", cluster_id, "apps",
-                                       app_id), data=kwargs)
+        else:
+            resp = self.http.put(url_maker("/clusters", cluster_id, "apps",
+                                           app_id), data=kwargs)
 
-    def get_app_instances(self, cluster_id, app_id):
-        """List all app instances"""
+        return self.process_data(resp)
+
+    def get_app_tasks(self, cluster_id, app_id):
+        """List all app tasks"""
 
         resp = self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
                                        "tasks"))
@@ -191,4 +195,23 @@ class AppMixin(object):
         resp = self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
                                        "appnodes"))
 
+        return self.process_data(resp)
+
+    def get_cluster_ports(self, cluster_id):
+        """list the inner ports and outer ports for a specific cluster"""
+
+        resp = self.http.get(url_maker("/clusters", cluster_id, "ports"))
+        return self.process_data(resp)
+
+    def get_app_scale_log(self, cluster_id, app_id, strategy_id):
+        """get the auto scale history when provided a strategy id"""
+
+        resp = self.http.get(url_maker("/clusters", cluster_id, "apps", app_id,
+                                       "scale", strategy_id))
+        return self.process_data(resp)
+
+    def get_user_scale_log(self):
+        """get all the auto scale history owned by this loggin user """
+
+        resp = self.http.get(url_maker("/scales"))
         return self.process_data(resp)

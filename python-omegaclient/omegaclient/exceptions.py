@@ -21,9 +21,9 @@ class OmegaException(Exception):
 
     msg = "A unknown exception occurred."
 
-    def __init__(self, message=None, status_code=None):
-        if not message:
-            message = self.msg
+    def __init__(self, msg=None, status_code=None):
+        if msg:
+            self.msg = msg
         self.status_code = status_code
 
-        super(OmegaException, self).__init__(message)
+        super(OmegaException, self).__init__(msg)

@@ -1,7 +1,4 @@
 requests
-beanbag
-# dev
 ipdb
 jsonschema
-webob
-
+coverage

@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import webob
 from jsonschema import SchemaError, ValidationError, validate
 
 from omegaclient.utils import url_maker
@@ -57,8 +56,8 @@ class ProjectMixin(object):
 
         try:
             validate(kwargs, schema)
-        except (SchemaError, ValidationError):
-            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+        except (SchemaError, ValidationError) as e:
+            return e
 
         resp = self.http.post("/projects", data=kwargs)
 
@@ -93,8 +92,8 @@ class ProjectMixin(object):
 
         try:
             validate(kwargs, schema)
-        except (SchemaError, ValidationError):
-            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+        except (SchemaError, ValidationError) as e:
+            return e
 
         return self.http.put(url_maker("/projects", project_id), data=kwargs)
 

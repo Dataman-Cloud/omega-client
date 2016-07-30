@@ -49,31 +49,20 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
     Client for user to use Dataman Cloud.
     """
 
-    def __init__(self, server_url, email, password):
+    def __init__(self, server_url, email, password, token=None):
 
         self.server_url = server_url
 
-        self.http = HTTPClient(server_url, email, password)
+        self.http = HTTPClient(server_url, email, password, token=token)
 
         super(OmegaClient, self).__init__()
 
     @staticmethod
     def process_data(resp):
         """Processing data response from Omega API."""
-
         try:
-            data = resp.json()
+            LOG.info(resp.json) 
+            return resp.json()
         except ValueError:
-            LOG.error("Request failed %d %s", resp.status_code, resp.text)
-            return resp.text
-
-        if 'code' in data:
-            if data['code'] != 0:
-                LOG.error("Request failed %s", data)
-                raise OmegaException(message="error",
-                                     status_code=data['code'])
-        LOG.info(data)
-        try:
-            return data['data']
-        except KeyError:
-            return data
+            LOG.info(resp.json) 
+            return resp.status_code

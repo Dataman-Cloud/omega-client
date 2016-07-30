@@ -28,3 +28,7 @@ class AuthMixin(object):
         resp = self.http.post("/auth", data=data)
 
         return self.process_data(resp)
+
+    def delete_token(self):
+        resp = self.http.delete("/auth")
+        return self.process_data(resp)

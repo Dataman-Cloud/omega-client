@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import webob
 from jsonschema import SchemaError, ValidationError, validate
 from omegaclient.utils import url_maker
 
@@ -58,8 +57,8 @@ class ClusterMixin(object):
           }
         try:
             validate(data, schema)
-        except (SchemaError, ValidationError):
-            raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
+        except (SchemaError, ValidationError) as e:
+            return e
 
         resp = self.http.post("/clusters", data=data)
 
