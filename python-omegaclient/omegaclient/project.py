@@ -86,9 +86,9 @@ class ProjectMixin(object):
                 "uid": {"type": "number"},
                 "active": {"type": "boolean"},
                 "period": {"type": "number"},
-                "trigger_type": {"type": "number"},
+                "triggerType": {"type": "number"},
             },
-            "required": ["uid", "active", "period", "trigger_type"]
+            "required": ["uid", "active", "period", "triggerType"]
         }
 
         try:
@@ -96,7 +96,7 @@ class ProjectMixin(object):
         except (SchemaError, ValidationError):
             raise webob.exc.HTTPBadRequest(explanation="Bad Paramaters")
 
-        return self.http.patch(url_maker("/projects", project_id), data=kwargs)
+        return self.http.put(url_maker("/projects", project_id), data=kwargs)
 
     def delete_project(self, project_id):
         """Delete specified project."""
