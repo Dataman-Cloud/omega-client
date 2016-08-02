@@ -28,7 +28,19 @@ from omegaclient.auth import AuthMixin
 
 from omegaclient.exceptions import OmegaException
 
+_DEFAULT_LOG_FORMAT = "%(asctime)s %(levelname)8s [%(name)s] %(message)s"
+_DEFAULT_LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+
 LOG = logging.getLogger(__name__)
+
+_handler = logging.FileHandler("/var/log/omega-client.log")
+_handler.setFormatter(
+    logging.Formatter(fmt=_DEFAULT_LOG_FORMAT,
+                      datefmt=_DEFAULT_LOG_DATE_FORMAT))
+
+LOG.addHandler(_handler)
+LOG.setLevel(logging.INFO)
 
 
 class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
