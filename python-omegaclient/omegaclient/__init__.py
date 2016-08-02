@@ -13,8 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import json
-import requests
+import logging
+
 
 from omegaclient.client import HTTPClient
 from omegaclient.project import ProjectMixin
@@ -27,7 +27,8 @@ from omegaclient.user import UserMixin
 from omegaclient.auth import AuthMixin
 
 from omegaclient.exceptions import OmegaException
-from omegaclient.utils import url_maker
+
+LOG = logging.getLogger(__name__)
 
 
 class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
@@ -48,12 +49,18 @@ class OmegaClient(ProjectMixin, AppMixin, ClusterMixin, LogMixin, AlertMixin,
     def process_data(resp):
         """Processing data response from Omega API."""
 
-        data = resp.json()
+        try:
+            data = resp.json()
+        except ValueError:
+            LOG.error("Request failed %d %s", resp.status_code, resp.text)
+            return resp.text
 
         if 'code' in data:
             if data['code'] != 0:
+                LOG.error("Request failed %s", data)
                 raise OmegaException(message="error",
                                      status_code=data['code'])
+        LOG.info(data)
         try:
             return data['data']
         except KeyError:
